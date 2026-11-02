@@ -44,6 +44,7 @@ class FocusOverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent?.action
         if (action == ACTION_SHOW_INTERCEPT) {
+            val appName = intent.getStringExtra(EXTRA_APP_NAME) ?: "Distracting App"
             val notification = buildForegroundNotification("Protecting your attention in $appName")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {

@@ -38,13 +38,17 @@ class UnscrollViewModel(
         // Collect reactive repository state
         viewModelScope.launch {
             combine(
-                settingsRepository.protectionMode,
-                settingsRepository.instagramConfig,
-                settingsRepository.youtubeConfig,
-                settingsRepository.tiktokConfig,
-                settingsRepository.sleepConfig,
-                settingsRepository.language
-            ) { mode, ig, yt, tt, sleep, lang ->
+                combine(
+                    settingsRepository.protectionMode,
+                    settingsRepository.instagramConfig,
+                    settingsRepository.youtubeConfig
+                ) { mode, ig, yt -> Triple(mode, ig, yt) },
+                combine(
+                    settingsRepository.tiktokConfig,
+                    settingsRepository.sleepConfig,
+                    settingsRepository.language
+                ) { tt, sleep, lang -> Triple(tt, sleep, lang) }
+            ) { (mode, ig, yt), (tt, sleep, lang) ->
                 _uiState.update { current ->
                     current.copy(
                         protectionMode = mode,
