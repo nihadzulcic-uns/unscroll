@@ -49,39 +49,49 @@ class UnscrollAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null || !isServiceRunning) return
 
+        if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+            event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
+        ) return
+
         val packageName = event.packageName?.toString() ?: return
         val currentTime = System.currentTimeMillis()
 
-        if (currentTime - lastInterceptTime < DEBOUNCE_MILLIS) {
-            return
-        }
-
-        // Check if overlay permission is granted (required to show window overlay)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            return
-        }
-
-        val rootNode = try {
-            rootInActiveWindow
-        } catch (e: Exception) {
-            null
-        } ?: return
+        if (currentTime - lastInterceptTime < DEBOUNCE_MILLIS) return
 
         when (packageName) {
             TargetApp.INSTAGRAM.packageName -> {
-                if (settingsRepository.instagramConfig.value.isProtectionEnabled) {
-                    inspectInstagram(rootNode, currentTime)
-                }
+                if (!settingsRepository.instagramConfig.value.isProtectionEnabled) return
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) return
+
+                val rootNode = try {
+                    rootInActiveWindow
+                } catch (e: Exception) {
+                    null
+                } ?: return
+
+                inspectInstagram(rootNode, currentTime)
             }
+
             TargetApp.YOUTUBE.packageName -> {
-                if (settingsRepository.youtubeConfig.value.isProtectionEnabled) {
-                    inspectYouTube(rootNode, currentTime)
-                }
+                if (!settingsRepository.youtubeConfig.value.isProtectionEnabled) return
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) return
+
+                val rootNode = try {
+                    rootInActiveWindow
+                } catch (e: Exception) {
+                    null
+                } ?: return
+
+                inspectYouTube(rootNode, currentTime)
             }
+
             TargetApp.TIKTOK.packageName, "com.ss.android.ugc.trill" -> {
-                if (settingsRepository.tiktokConfig.value.isProtectionEnabled) {
-                    inspectTikTok(rootNode, currentTime)
-                }
+                if (!settingsRepository.tiktokConfig.value.isProtectionEnabled) return
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) return
+
+                lastInterceptTime = currentTime
+                statsRepository.recordInterception()
+                triggerMindfulInterception("TikTok")
             }
         }
     }
@@ -108,13 +118,6 @@ class UnscrollAccessibilityService : AccessibilityService() {
             statsRepository.recordInterception()
             triggerMindfulInterception("YouTube Shorts")
         }
-    }
-
-    private fun inspectTikTok(node: AccessibilityNodeInfo, time: Long) {
-        // TikTok is entirely a vertical short-form feed
-        lastInterceptTime = time
-        statsRepository.recordInterception()
-        triggerMindfulInterception("TikTok")
     }
 
     /**
