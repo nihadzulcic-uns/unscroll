@@ -2,8 +2,10 @@
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="sharedpref" path="unscroll_preferences" />
+        <exclude domain="sharedpref" path="unscroll_stats_preferences" />
     </cloud-backup>
     <device-transfer>
-        <include domain="sharedpref" path="unscroll_preferences" />
+        <exclude domain="sharedpref" path="unscroll_preferences" />
+        <exclude domain="sharedpref" path="unscroll_stats_preferences" />
     </device-transfer>
 </data-extraction-rules>
