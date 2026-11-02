@@ -144,7 +144,7 @@ fun SettingsScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Text(
-                        text = "100% On-Device Privacy",
+                        text = "On-Device Privacy",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 14.sp,
@@ -155,7 +155,7 @@ fun SettingsScreen(
 
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "UNSCROLL never transmits data to remote servers. All feed detection runs locally inside Android's Accessibility engine. Password fields and private messages are strictly filtered and never inspected.",
+                    text = "Feed detection runs locally on your device. The current app build does not request Internet access. The accessibility service checks selected interface identifiers and descriptions to detect supported feeds, while skipping recognized password and text-input fields.",
                     style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary, fontSize = 11.sp)
                 )
 
@@ -262,11 +262,11 @@ fun SettingsScreen(
                 listOf(
                     "✓ Jetpack Compose & Material 3 Dark Architecture",
                     "✓ On-Device Reels, Shorts & TikTok Detection Service",
-                    "✓ Strict Zero-Password / Zero-Text Collection Filter",
+                    "✓ Recognized Password and Text-Input Fields Are Skipped",
                     "✓ Mindful Interception & Breathing Overlay Shield",
                     "✓ Focus Mode Timer with Custom Durations",
                     "✓ Circadian Sleep Mode & Overnight App Lockout",
-                    "✓ UsageStatsManager Screen Time Analytics (No Fake Stats)",
+                    "✓ UsageStatsManager Screen Time Analytics",
                     "✓ Verified Service Status (Not configured, Permission required, Active, Error)",
                     "✓ Local SharedPreferences Persistence"
                 ).forEach { item ->

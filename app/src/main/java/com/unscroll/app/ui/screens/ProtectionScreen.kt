@@ -211,7 +211,7 @@ fun ProtectionScreen(
                 )
                 Column {
                     Text(
-                        text = "Zero-Password Privacy Guarantee",
+                        text = "Privacy-conscious feed detection",
                         style = MaterialTheme.typography.titleMedium.copy(
                             color = TextPrimary,
                             fontWeight = FontWeight.SemiBold,
@@ -220,7 +220,7 @@ fun ProtectionScreen(
                     )
                     Spacer(modifier = Modifier.height(3.dp))
                     Text(
-                        text = "UNSCROLL strictly ignores all password fields, text inputs, and private messages. Interception functions entirely on-device by checking view container IDs.",
+                        text = "Feed detection runs on your device by checking selected interface identifiers and descriptions. Recognized password and text-input fields are skipped. The service may access parts of the active app interface to identify supported feeds.",
                         style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary, fontSize = 11.sp)
                     )
                 }

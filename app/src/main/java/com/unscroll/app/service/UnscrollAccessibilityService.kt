@@ -16,10 +16,11 @@ import com.unscroll.app.data.repository.StatsRepository
  * Native Android Accessibility Service that non-invasively detects algorithmic short-form
  * video containers (Reels, Shorts, TikTok) in real time.
  *
- * PRIVACY GUARANTEE:
- * - NEVER collects passwords, keystrokes, message content, or personal info.
- * - EditText nodes, password fields, and input fields are STRICTLY IGNORED.
- * - Operates 100% on-device with zero network transmissions.
+ * PRIVACY NOTES:
+ * - Feed detection is processed locally on the device.
+ * - Recognized password and text-input nodes are skipped.
+ * - The service checks selected view IDs and accessibility descriptions.
+ * - It may access parts of the active app's interface to identify feeds.
  */
 class UnscrollAccessibilityService : AccessibilityService() {
 
@@ -121,26 +122,25 @@ class UnscrollAccessibilityService : AccessibilityService() {
     }
 
     /**
-     * Traverses UI nodes safely.
-     * STRICT PRIVACY FILTER: Password fields, EditTexts, and user messages are completely ignored.
+     * Traverses UI nodes to identify supported feed containers.
+     * Recognized password and text-input nodes are skipped.
      */
     private fun searchNodesForKeywords(node: AccessibilityNodeInfo?, keywords: List<String>): Boolean {
         if (node == null) return false
 
-        // PRIVACY ENFORCEMENT: Never inspect input or password fields
+        // Skip nodes recognized as password or text-input fields
         if (node.isPassword) return false
         val className = node.className?.toString() ?: ""
         if (className.contains("EditText", ignoreCase = true) || className.contains("Input", ignoreCase = true)) {
             return false
         }
 
-        // Only inspect resource view IDs and accessibility descriptions for layout signatures
+        // Inspect resource view IDs only; do not read accessibility descriptions
         val viewId = node.viewIdResourceName?.lowercase() ?: ""
-        val desc = node.contentDescription?.toString()?.lowercase() ?: ""
 
         for (keyword in keywords) {
             val kw = keyword.lowercase()
-            if (viewId.contains(kw) || desc.contains(kw)) {
+            if (viewId.contains(kw)) {
                 return true
             }
         }
