@@ -131,7 +131,7 @@ class FocusOverlayService : Service() {
         }
 
         val btnContinue = Button(this).apply {
-            text = "Continue with 10s Intention"
+            text = "Continue"
             setBackgroundColor(0x2034D399.toInt())
             setTextColor(0xFF94A3B8.toInt())
             setOnClickListener {
