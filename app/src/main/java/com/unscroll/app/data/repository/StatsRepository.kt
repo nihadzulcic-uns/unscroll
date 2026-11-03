@@ -18,6 +18,7 @@ import java.util.Calendar
 /**
  * Repository responsible for querying real on-device screen time metrics via Android UsageStatsManager.
  * Zero fabricated or hardcoded statistics. If permission is not granted, displays clear empty state.
+ * Interception counts are stored separately for each local calendar day.
  */
 class StatsRepository(private val context: Context) {
 
