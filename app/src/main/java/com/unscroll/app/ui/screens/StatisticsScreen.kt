@@ -45,7 +45,7 @@ fun StatisticsScreen(
             )
         )
         Text(
-            text = "Verified metrics on screen time and thwarted doomscroll loops",
+            text = "Measured screen time and detected short-form feed entries",
             style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
         )
 
@@ -148,7 +148,7 @@ fun StatisticsScreen(
 
                         Column(horizontalAlignment = Alignment.End) {
                             Text(
-                                text = "Interceptions",
+                                text = "Feed entries detected",
                                 style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary)
                             )
                             Text(
