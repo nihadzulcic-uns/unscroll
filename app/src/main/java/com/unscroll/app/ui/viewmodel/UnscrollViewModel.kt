@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.unscroll.app.data.model.*
 import com.unscroll.app.data.repository.SettingsRepository
 import com.unscroll.app.data.repository.StatsRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -33,6 +34,7 @@ class UnscrollViewModel(
     val uiState: StateFlow<UnscrollUiState> = _uiState.asStateFlow()
 
     private var timerJob: Job? = null
+    private var statsRefreshJob: Job? = null
 
     init {
         // Collect reactive repository state
@@ -66,14 +68,18 @@ class UnscrollViewModel(
     }
 
     fun refreshStats() {
-        val overview = statsRepository.getDailyOverview()
-        val breakdown = statsRepository.getAppBreakdown()
-        settingsRepository.refreshAllStatuses()
-        _uiState.update {
-            it.copy(
-                overview = overview,
-                appUsageList = breakdown
-            )
+        // UsageStatsManager queries can be slow on some devices. Keep them off the UI thread.
+        statsRefreshJob?.cancel()
+        statsRefreshJob = viewModelScope.launch(Dispatchers.IO) {
+            val overview = statsRepository.getDailyOverview()
+            val breakdown = statsRepository.getAppBreakdown()
+            settingsRepository.refreshAllStatuses()
+            _uiState.update {
+                it.copy(
+                    overview = overview,
+                    appUsageList = breakdown
+                )
+            }
         }
     }
 
