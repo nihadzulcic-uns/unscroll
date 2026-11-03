@@ -362,12 +362,6 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        AppStatusRow(
-            name = "TikTok",
-            rule = "Feed Delay & Session Limit",
-            status = uiState.tiktokConfig.status,
-            onClick = onNavigateToProtection
-        )
     }
 }
 
