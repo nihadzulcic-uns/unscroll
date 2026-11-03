@@ -182,7 +182,12 @@ class UnscrollViewModel(
     }
 
     fun simulateInterception(appName: String) {
-        onInterceptionTriggered(appName)
+        _uiState.update {
+            it.copy(
+                isInterceptionOverlayActive = true,
+                interceptedAppTitle = appName
+            )
+        }
     }
 
     fun dismissInterception() {
