@@ -12,6 +12,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
@@ -142,7 +143,8 @@ class FocusOverlayService : Service() {
         try {
             windowManager?.addView(overlayView, params)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("FocusOverlayService", "Unable to display the focus overlay", e)
+            closeOverlayAndService()
         }
     }
 
@@ -157,7 +159,7 @@ class FocusOverlayService : Service() {
             try {
                 windowManager?.removeView(overlayView)
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.w("FocusOverlayService", "Overlay was already detached or could not be removed", e)
             }
             overlayView = null
         }
