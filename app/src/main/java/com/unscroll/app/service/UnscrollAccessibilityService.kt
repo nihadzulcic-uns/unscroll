@@ -1,7 +1,6 @@
 package com.unscroll.app.service
 
 import android.accessibilityservice.AccessibilityService
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
@@ -10,7 +9,6 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import com.unscroll.app.data.model.TargetApp
 import com.unscroll.app.data.repository.SettingsRepository
-import com.unscroll.app.data.repository.StatsRepository
 
 /**
  * Native Android Accessibility Service that checks selected view IDs for Instagram Reels
@@ -34,12 +32,10 @@ class UnscrollAccessibilityService : AccessibilityService() {
     private var activeTargetPackage: String? = null
     private var isFeedCurrentlyIntercepted = false
     private lateinit var settingsRepository: SettingsRepository
-    private lateinit var statsRepository: StatsRepository
 
     override fun onCreate() {
         super.onCreate()
         settingsRepository = SettingsRepository(applicationContext)
-        statsRepository = StatsRepository(applicationContext)
     }
 
     override fun onServiceConnected() {
@@ -68,7 +64,6 @@ class UnscrollAccessibilityService : AccessibilityService() {
 
         when (packageName) {
             TargetApp.INSTAGRAM.packageName -> {
-                // Refresh only for supported target apps, not every system accessibility event.
                 settingsRepository.refreshProtectionConfigs()
                 if (!settingsRepository.instagramConfig.value.isProtectionEnabled ||
                     (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this))) {
@@ -125,7 +120,6 @@ class UnscrollAccessibilityService : AccessibilityService() {
         )
         if (isReelsActive && !isFeedCurrentlyIntercepted) {
             isFeedCurrentlyIntercepted = true
-            statsRepository.recordInterception()
             triggerMindfulInterception("Instagram Reels")
         } else if (!isReelsActive) {
             isFeedCurrentlyIntercepted = false
@@ -139,7 +133,6 @@ class UnscrollAccessibilityService : AccessibilityService() {
         )
         if (isShortsActive && !isFeedCurrentlyIntercepted) {
             isFeedCurrentlyIntercepted = true
-            statsRepository.recordInterception()
             triggerMindfulInterception("YouTube Shorts")
         } else if (!isShortsActive) {
             isFeedCurrentlyIntercepted = false
@@ -153,24 +146,18 @@ class UnscrollAccessibilityService : AccessibilityService() {
     private fun searchNodesForKeywords(node: AccessibilityNodeInfo?, keywords: List<String>): Boolean {
         if (node == null) return false
 
-        // Skip nodes recognized as password or text-input fields
         if (node.isPassword) return false
         val className = node.className?.toString() ?: ""
-        if (className.contains("EditText", ignoreCase = true) || className.contains("Input", ignoreCase = true)) {
+        if (className.contains("EditText", ignoreCase = true) ||
+            className.contains("Input", ignoreCase = true)
+        ) {
             return false
         }
 
-        // Inspect resource view IDs only; do not read accessibility descriptions
+        // Inspect resource view IDs only; do not read accessibility descriptions.
         val viewId = node.viewIdResourceName?.lowercase() ?: ""
+        if (keywords.any { viewId.contains(it.lowercase()) }) return true
 
-        for (keyword in keywords) {
-            val kw = keyword.lowercase()
-            if (viewId.contains(kw)) {
-                return true
-            }
-        }
-
-        // Recurse children safely
         val childCount = node.childCount
         for (i in 0 until childCount) {
             val child = try {
@@ -192,7 +179,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
     }
 
     private fun triggerMindfulInterception(appName: String) {
-        Log.i(TAG, "Mindful barrier triggered for: $appName")
+        Log.i(TAG, "Feed identifier matched for: $appName")
         val intent = Intent(this, FocusOverlayService::class.java).apply {
             action = FocusOverlayService.ACTION_SHOW_INTERCEPT
             putExtra(FocusOverlayService.EXTRA_APP_NAME, appName)
