@@ -30,12 +30,16 @@ class StatsRepository(private val context: Context) {
     private val _interceptionCounter = MutableStateFlow(prefs.getInt(activeInterceptionKey, 0))
     val interceptionCounter: StateFlow<Int> = _interceptionCounter.asStateFlow()
 
-    fun recordInterception() {
+    private fun refreshInterceptionCounterForToday() {
         val todayKey = interceptionKeyForToday()
         if (todayKey != activeInterceptionKey) {
             activeInterceptionKey = todayKey
             _interceptionCounter.value = prefs.getInt(todayKey, 0)
         }
+    }
+
+    fun recordInterception() {
+        refreshInterceptionCounterForToday()
         val next = _interceptionCounter.value + 1
         prefs.edit().putInt(activeInterceptionKey, next).apply()
         _interceptionCounter.value = next
@@ -68,6 +72,7 @@ class StatsRepository(private val context: Context) {
      * Never returns fake or fabricated numbers.
      */
     fun getDailyOverview(): ScreenTimeOverview {
+        refreshInterceptionCounterForToday()
         val hasPermission = hasUsageStatsPermission()
 
         if (!hasPermission) {
@@ -144,6 +149,7 @@ class StatsRepository(private val context: Context) {
      * Returns empty list if permission is missing, or actual queried usage.
      */
     fun getAppBreakdown(): List<DailyAppUsage> {
+        refreshInterceptionCounterForToday()
         val hasPermission = hasUsageStatsPermission()
         if (!hasPermission) {
             return emptyList()
