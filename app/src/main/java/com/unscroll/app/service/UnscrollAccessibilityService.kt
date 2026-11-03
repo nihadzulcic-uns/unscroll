@@ -32,7 +32,8 @@ class UnscrollAccessibilityService : AccessibilityService() {
     }
 
     private var lastInterceptTime = 0L
-    private val DEBOUNCE_MILLIS = 4000L // Prevent repetitive firing on single scroll
+    private var isFeedCurrentlyIntercepted = false
+    private val DEBOUNCE_MILLIS = 4000L // Safety debounce for rapid UI transitions
     private lateinit var settingsRepository: SettingsRepository
     private lateinit var statsRepository: StatsRepository
 
@@ -56,6 +57,9 @@ class UnscrollAccessibilityService : AccessibilityService() {
         ) return
 
         val packageName = event.packageName?.toString() ?: return
+        if (packageName != TargetApp.INSTAGRAM.packageName && packageName != TargetApp.YOUTUBE.packageName) {
+            isFeedCurrentlyIntercepted = false
+        }
         val currentTime = System.currentTimeMillis()
 
         if (currentTime - lastInterceptTime < DEBOUNCE_MILLIS) return
@@ -111,10 +115,13 @@ class UnscrollAccessibilityService : AccessibilityService() {
             node,
             listOf("clips_viewer", "reel_viewer", "reels_tab", "reel_player")
         )
-        if (isReelsActive) {
+        if (isReelsActive && !isFeedCurrentlyIntercepted) {
+            isFeedCurrentlyIntercepted = true
             lastInterceptTime = time
             statsRepository.recordInterception()
             triggerMindfulInterception("Instagram Reels")
+        } else if (!isReelsActive) {
+            isFeedCurrentlyIntercepted = false
         }
     }
 
@@ -123,10 +130,13 @@ class UnscrollAccessibilityService : AccessibilityService() {
             node,
             listOf("reel_player_page", "shorts_pivot", "shorts_container", "shorts_player")
         )
-        if (isShortsActive) {
+        if (isShortsActive && !isFeedCurrentlyIntercepted) {
+            isFeedCurrentlyIntercepted = true
             lastInterceptTime = time
             statsRepository.recordInterception()
             triggerMindfulInterception("YouTube Shorts")
+        } else if (!isShortsActive) {
+            isFeedCurrentlyIntercepted = false
         }
     }
 
