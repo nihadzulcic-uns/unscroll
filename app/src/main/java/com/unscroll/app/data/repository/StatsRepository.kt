@@ -26,12 +26,18 @@ class StatsRepository(private val context: Context) {
         Context.MODE_PRIVATE
     )
 
-    private val _interceptionCounter = MutableStateFlow(prefs.getInt(interceptionKeyForToday(), 0))
+    private var activeInterceptionKey = interceptionKeyForToday()
+    private val _interceptionCounter = MutableStateFlow(prefs.getInt(activeInterceptionKey, 0))
     val interceptionCounter: StateFlow<Int> = _interceptionCounter.asStateFlow()
 
     fun recordInterception() {
+        val todayKey = interceptionKeyForToday()
+        if (todayKey != activeInterceptionKey) {
+            activeInterceptionKey = todayKey
+            _interceptionCounter.value = prefs.getInt(todayKey, 0)
+        }
         val next = _interceptionCounter.value + 1
-        prefs.edit().putInt(interceptionKeyForToday(), next).apply()
+        prefs.edit().putInt(activeInterceptionKey, next).apply()
         _interceptionCounter.value = next
     }
 
