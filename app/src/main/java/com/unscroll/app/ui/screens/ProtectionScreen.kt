@@ -140,7 +140,7 @@ fun ProtectionScreen(
         // Instagram Card
         AppProtectionSettingCard(
             title = "Instagram",
-            subtitle = "Reels & Explore Filter",
+            subtitle = "Instagram Reels detection (experimental)",
             config = uiState.instagramConfig,
             onConfigChange = onUpdateInstagram,
             onOpenAccessibilitySettings = {
@@ -158,7 +158,7 @@ fun ProtectionScreen(
         // YouTube Card
         AppProtectionSettingCard(
             title = "YouTube",
-            subtitle = "Shorts Loop Disruptor",
+            subtitle = "YouTube Shorts detection (experimental)",
             config = uiState.youtubeConfig,
             onConfigChange = onUpdateYouTube,
             onOpenAccessibilitySettings = {
@@ -172,22 +172,6 @@ fun ProtectionScreen(
         )
 
         Spacer(modifier = Modifier.height(12.dp))
-
-        // TikTok Card
-        AppProtectionSettingCard(
-            title = "TikTok",
-            subtitle = "Feed Friction Barrier",
-            config = uiState.tiktokConfig,
-            onConfigChange = onUpdateTikTok,
-            onOpenAccessibilitySettings = {
-                context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-            },
-            onOpenOverlaySettings = {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    context.startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")))
-                }
-            }
-        )
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -220,7 +204,7 @@ fun ProtectionScreen(
                     )
                     Spacer(modifier = Modifier.height(3.dp))
                     Text(
-                        text = "Feed detection runs on your device by checking selected interface identifiers and descriptions. Recognized password and text-input fields are skipped. The service may access parts of the active app interface to identify supported feeds.",
+                        text = "Feed detection runs locally by checking selected view IDs in Instagram and YouTube. The service does not read screen text, messages, accessibility descriptions, keystrokes, or passwords. TikTok detection is currently unavailable.",
                         style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary, fontSize = 11.sp)
                     )
                 }
