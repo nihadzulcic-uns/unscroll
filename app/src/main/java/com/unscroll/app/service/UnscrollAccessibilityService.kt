@@ -54,7 +54,8 @@ class UnscrollAccessibilityService : AccessibilityService() {
         if (event == null || !isServiceRunning) return
 
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
-            event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
+            event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+            event.eventType != AccessibilityEvent.TYPE_VIEW_SCROLLED
         ) return
 
         val packageName = event.packageName?.toString() ?: return
