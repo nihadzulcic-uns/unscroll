@@ -32,6 +32,13 @@ jobs:
           echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/signing/unscroll-release.jks"
           echo "KEYSTORE_FILE=$RUNNER_TEMP/signing/unscroll-release.jks" >> "$GITHUB_ENV"
 
+      - name: Verify Release Keystore Password
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          keytool -list -keystore "$KEYSTORE_FILE" -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS"
+
       - name: Build Signed Release APK
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
