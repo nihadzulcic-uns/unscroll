@@ -69,8 +69,11 @@ class UnscrollAccessibilityService : AccessibilityService() {
             TargetApp.INSTAGRAM.packageName -> {
                 // Refresh only for supported target apps, not every system accessibility event.
                 settingsRepository.refreshProtectionConfigs()
-                if (!settingsRepository.instagramConfig.value.isProtectionEnabled) return
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) return
+                if (!settingsRepository.instagramConfig.value.isProtectionEnabled ||
+                    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this))) {
+                    isFeedCurrentlyIntercepted = false
+                    return
+                }
 
                 val rootNode = try {
                     rootInActiveWindow
@@ -87,8 +90,11 @@ class UnscrollAccessibilityService : AccessibilityService() {
 
             TargetApp.YOUTUBE.packageName -> {
                 settingsRepository.refreshProtectionConfigs()
-                if (!settingsRepository.youtubeConfig.value.isProtectionEnabled) return
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) return
+                if (!settingsRepository.youtubeConfig.value.isProtectionEnabled ||
+                    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this))) {
+                    isFeedCurrentlyIntercepted = false
+                    return
+                }
 
                 val rootNode = try {
                     rootInActiveWindow
@@ -216,6 +222,8 @@ class UnscrollAccessibilityService : AccessibilityService() {
     override fun onDestroy() {
         super.onDestroy()
         isServiceRunning = false
+        activeTargetPackage = null
+        isFeedCurrentlyIntercepted = false
         Log.i(TAG, "UNSCROLL Accessibility Service Destroyed")
     }
 }
