@@ -42,7 +42,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Accessibility Service: Non-invasive short-form video detector (Reels, Shorts, TikTok) -->
+        <!-- Accessibility Service: locally identifies selected Instagram Reels and YouTube Shorts view IDs -->
         <service
             android:name=".service.UnscrollAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
