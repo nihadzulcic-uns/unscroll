@@ -69,7 +69,7 @@ class StatsRepository(private val context: Context) {
             return ScreenTimeOverview(
                 totalScreenTimeMinutes = 0,
                 totalInterceptions = _interceptionCounter.value,
-                totalTimeSavedMinutes = (_interceptionCounter.value * 6),
+                totalTimeSavedMinutes = 0,
                 hasUsageData = false,
                 isRealUsageStatsAvailable = false,
                 dataNotice = "Permission required: Grant Android Usage Access in System Settings to view screen time."
@@ -80,7 +80,7 @@ class StatsRepository(private val context: Context) {
             ?: return ScreenTimeOverview(
                 totalScreenTimeMinutes = 0,
                 totalInterceptions = _interceptionCounter.value,
-                totalTimeSavedMinutes = (_interceptionCounter.value * 6),
+                totalTimeSavedMinutes = 0,
                 hasUsageData = false,
                 isRealUsageStatsAvailable = false,
                 dataNotice = "UsageStatsManager service unavailable on this device."
@@ -105,7 +105,7 @@ class StatsRepository(private val context: Context) {
             return ScreenTimeOverview(
                 totalScreenTimeMinutes = 0,
                 totalInterceptions = _interceptionCounter.value,
-                totalTimeSavedMinutes = (_interceptionCounter.value * 6),
+                totalTimeSavedMinutes = 0,
                 hasUsageData = true,
                 isRealUsageStatsAvailable = true,
                 dataNotice = "No social media usage detected yet today."
@@ -123,12 +123,10 @@ class StatsRepository(private val context: Context) {
             }
         }
 
-        val totalSaved = (_interceptionCounter.value * 6)
-
         return ScreenTimeOverview(
             totalScreenTimeMinutes = totalTargetMinutes,
             totalInterceptions = _interceptionCounter.value,
-            totalTimeSavedMinutes = totalSaved,
+            totalTimeSavedMinutes = 0,
             hasUsageData = true,
             isRealUsageStatsAvailable = true,
             dataNotice = "Live data synced from Android UsageStatsManager."
