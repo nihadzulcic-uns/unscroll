@@ -105,7 +105,7 @@ fun ProtectionScreen(
                 Surface(
                     modifier = Modifier
                         .weight(1f)
-                        .clickable { onSetProtectionMode(mode) },
+                        .clickable(enabled = mode == ProtectionMode.AUTOMATIC) { onSetProtectionMode(mode) },
                     shape = RoundedCornerShape(8.dp),
                     color = if (isSelected) CharcoalSurfaceElevated else Color.Transparent,
                     border = if (isSelected) androidx.compose.foundation.BorderStroke(1.dp, SoftGreenPrimary) else null
@@ -130,9 +130,9 @@ fun ProtectionScreen(
         Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = when (uiState.protectionMode) {
-                ProtectionMode.AUTOMATIC -> "Auto: Senses Reels & Shorts in active window and presents a calm breath barrier."
-                ProtectionMode.MANUAL -> "Manual: Allows viewing until daily limit is reached."
-                ProtectionMode.STRICT -> "Strict: Hard block without skip options during focus sessions."
+                ProtectionMode.AUTOMATIC -> "Auto: Experimental Reels and Shorts view-ID detection can show a mindful pause overlay."
+                ProtectionMode.MANUAL -> "Manual limits are planned and are not enforced in this version."
+                ProtectionMode.STRICT -> "Strict blocking is planned and is not enforced in this version."
             },
             style = MaterialTheme.typography.bodySmall.copy(color = TextMuted, fontSize = 11.sp)
         )
@@ -418,7 +418,12 @@ private fun AppProtectionSettingCard(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Daily Limit
+                Text(
+                    text = "The options below are saved preferences only. Daily quota enforcement is not available yet.",
+                    style = MaterialTheme.typography.labelSmall.copy(color = AmberWarning, fontSize = 11.sp)
+                )
+
+                // Daily Limit preference (not currently enforced)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
