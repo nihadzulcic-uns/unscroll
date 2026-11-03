@@ -169,37 +169,19 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Real Stats breakdown
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column {
-                            Text(
-                                text = "Interceptions",
-                                style = MaterialTheme.typography.labelSmall.copy(color = TextMuted)
+                    // Feed entries are detections, not guaranteed successful overlays or time saved.
+                    Column {
+                        Text(
+                            text = "Feed entries detected",
+                            style = MaterialTheme.typography.labelSmall.copy(color = TextMuted)
+                        )
+                        Text(
+                            text = "${uiState.overview.totalInterceptions} entries detected",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = TextPrimary,
+                                fontWeight = FontWeight.Medium
                             )
-                            Text(
-                                text = "${uiState.overview.totalInterceptions} events recorded",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = TextPrimary,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            )
-                        }
-                        Column(horizontalAlignment = Alignment.End) {
-                            Text(
-                                text = "Estimated Saved",
-                                style = MaterialTheme.typography.labelSmall.copy(color = TextMuted)
-                            )
-                            Text(
-                                text = "${uiState.overview.totalTimeSavedMinutes}m reclaimed",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = SoftGreenSubtle,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            )
-                        }
+                        )
                     }
                 } else {
                     // Empty state / Permission prompt
