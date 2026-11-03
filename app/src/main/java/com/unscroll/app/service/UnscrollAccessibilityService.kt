@@ -56,6 +56,8 @@ class UnscrollAccessibilityService : AccessibilityService() {
         ) return
 
         val packageName = event.packageName?.toString() ?: return
+        // Read the latest toggles saved by the Activity before evaluating this event.
+        settingsRepository.refreshProtectionConfigs()
         val currentTime = System.currentTimeMillis()
 
         if (currentTime - lastInterceptTime < DEBOUNCE_MILLIS) return
