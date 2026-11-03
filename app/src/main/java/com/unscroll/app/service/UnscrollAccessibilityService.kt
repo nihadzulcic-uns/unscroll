@@ -56,14 +56,14 @@ class UnscrollAccessibilityService : AccessibilityService() {
         ) return
 
         val packageName = event.packageName?.toString() ?: return
-        // Read the latest toggles saved by the Activity before evaluating this event.
-        settingsRepository.refreshProtectionConfigs()
         val currentTime = System.currentTimeMillis()
 
         if (currentTime - lastInterceptTime < DEBOUNCE_MILLIS) return
 
         when (packageName) {
             TargetApp.INSTAGRAM.packageName -> {
+                // Refresh only for supported target apps, not every system accessibility event.
+                settingsRepository.refreshProtectionConfigs()
                 if (!settingsRepository.instagramConfig.value.isProtectionEnabled) return
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) return
 
@@ -73,10 +73,15 @@ class UnscrollAccessibilityService : AccessibilityService() {
                     null
                 } ?: return
 
-                inspectInstagram(rootNode, currentTime)
+                try {
+                    inspectInstagram(rootNode, currentTime)
+                } finally {
+                    rootNode.recycle()
+                }
             }
 
             TargetApp.YOUTUBE.packageName -> {
+                settingsRepository.refreshProtectionConfigs()
                 if (!settingsRepository.youtubeConfig.value.isProtectionEnabled) return
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) return
 
@@ -86,7 +91,11 @@ class UnscrollAccessibilityService : AccessibilityService() {
                     null
                 } ?: return
 
-                inspectYouTube(rootNode, currentTime)
+                try {
+                    inspectYouTube(rootNode, currentTime)
+                } finally {
+                    rootNode.recycle()
+                }
             }
 
             TargetApp.TIKTOK.packageName, "com.ss.android.ugc.trill" -> {
@@ -154,7 +163,11 @@ class UnscrollAccessibilityService : AccessibilityService() {
                 null
             }
             if (child != null) {
-                val found = searchNodesForKeywords(child, keywords)
+                val found = try {
+                    searchNodesForKeywords(child, keywords)
+                } finally {
+                    child.recycle()
+                }
                 if (found) return true
             }
         }
