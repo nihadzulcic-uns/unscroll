@@ -155,7 +155,7 @@ fun SettingsScreen(
 
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "Feed detection runs locally on your device. The current app build does not request Internet access. The accessibility service checks selected interface identifiers and descriptions to detect supported feeds, while skipping recognized password and text-input fields.",
+                    text = "Feed detection runs locally on your device. The current app build does not request Internet access. The accessibility service checks selected interface view IDs locally to detect supported feed containers. It does not read on-screen text or accessibility descriptions.",
                     style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary, fontSize = 11.sp)
                 )
 
