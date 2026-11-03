@@ -261,11 +261,12 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(6.dp))
                 listOf(
                     "✓ Jetpack Compose & Material 3 Dark Architecture",
-                    "✓ On-Device Reels, Shorts & TikTok Detection Service",
-                    "✓ Recognized Password and Text-Input Fields Are Skipped",
+                    "✓ Experimental Instagram Reels & YouTube Shorts view-ID checks (not guaranteed on every app version)",
+                    "○ TikTok feed-specific detection (disabled until reliable identifiers are verified)",
+                    "✓ Recognized password and text-input nodes are skipped during view-ID traversal",
                     "✓ Mindful Interception & Breathing Overlay Shield",
                     "✓ Focus Mode Timer with Custom Durations",
-                    "✓ Circadian Sleep Mode & Overnight App Lockout",
+                    "○ Sleep schedule configuration (automatic system-wide lockout not yet verified)",
                     "✓ UsageStatsManager Screen Time Analytics",
                     "✓ Verified Service Status (Not configured, Permission required, Active, Error)",
                     "✓ Local SharedPreferences Persistence"
