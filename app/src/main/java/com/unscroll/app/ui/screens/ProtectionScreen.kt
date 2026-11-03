@@ -393,26 +393,15 @@ private fun AppProtectionSettingCard(
                 HorizontalDivider(color = CharcoalSurfaceBorder)
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Short-form only toggle
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Target Short-Form Feeds Only",
-                            style = MaterialTheme.typography.bodyMedium.copy(color = TextPrimary, fontSize = 13.sp)
-                        )
-                        Text(
-                            text = "Blocks Reels/Shorts; keeps direct messages and search available.",
-                            style = MaterialTheme.typography.labelSmall.copy(color = TextMuted, fontSize = 11.sp)
-                        )
-                    }
-                    Checkbox(
-                        checked = config.blockShortFormOnly,
-                        onCheckedChange = { onConfigChange(config.copy(blockShortFormOnly = it)) },
-                        colors = CheckboxDefaults.colors(checkedColor = SoftGreenPrimary)
+                // Detection is limited to selected short-form feed identifiers in this version.
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "Short-form feed detection only",
+                        style = MaterialTheme.typography.bodyMedium.copy(color = TextPrimary, fontSize = 13.sp)
+                    )
+                    Text(
+                        text = "This experimental version checks selected Reels/Shorts view IDs only. This behavior cannot currently be changed.",
+                        style = MaterialTheme.typography.labelSmall.copy(color = TextMuted, fontSize = 11.sp)
                     )
                 }
 
