@@ -288,7 +288,7 @@ fun HomeScreen(
                     }
                 } else {
                     Text(
-                        text = "Pause algorithmic feeds with an intentional timed shield.",
+                        text = "Use a simple focus timer to stay mindful. This timer does not block other apps.",
                         style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                     )
 
@@ -346,7 +346,7 @@ fun HomeScreen(
         // App cards with honest ServiceStatus
         AppStatusRow(
             name = "Instagram",
-            rule = if (uiState.instagramConfig.blockShortFormOnly) "Reels & Explore Filter" else "Full App Guard",
+            rule = "Experimental Reels detection",
             status = uiState.instagramConfig.status,
             onClick = onNavigateToProtection
         )
@@ -355,7 +355,7 @@ fun HomeScreen(
 
         AppStatusRow(
             name = "YouTube",
-            rule = if (uiState.youtubeConfig.blockShortFormOnly) "Shorts Loop Filter" else "Full App Guard",
+            rule = "Experimental Shorts detection",
             status = uiState.youtubeConfig.status,
             onClick = onNavigateToProtection
         )
