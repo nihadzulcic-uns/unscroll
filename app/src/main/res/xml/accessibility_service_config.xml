@@ -3,7 +3,7 @@
     android:description="@string/accessibility_service_description"
     android:packageNames="com.instagram.android,com.google.android.youtube"
     android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
-    android:accessibilityFlags="flagDefault"
+    android:accessibilityFlags="flagDefault|flagReportViewIds"
     android:accessibilityFeedbackType="feedbackHaptic"
     android:notificationTimeout="100"
     android:canRetrieveWindowContent="true"
