@@ -75,7 +75,11 @@ class UnscrollAccessibilityService : AccessibilityService() {
                     rootInActiveWindow
                 } catch (e: Exception) {
                     null
-                } ?: return
+                } ?: run {
+                    // Do not leave the feed latch stuck if Android temporarily exposes no root node.
+                    isFeedCurrentlyIntercepted = false
+                    return
+                }
 
                 try {
                     inspectInstagram(rootNode)
@@ -96,7 +100,11 @@ class UnscrollAccessibilityService : AccessibilityService() {
                     rootInActiveWindow
                 } catch (e: Exception) {
                     null
-                } ?: return
+                } ?: run {
+                    // Do not leave the feed latch stuck if Android temporarily exposes no root node.
+                    isFeedCurrentlyIntercepted = false
+                    return
+                }
 
                 try {
                     inspectYouTube(rootNode)
