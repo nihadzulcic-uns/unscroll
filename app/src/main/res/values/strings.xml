@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">UNSCROLL</string>
     <string name="accessibility_service_label">UNSCROLL Doomscroll Interceptor</string>
-    <string name="accessibility_service_description">Detects short-form algorithmic video feeds (Instagram Reels, YouTube Shorts, and TikTok) in real-time on-device and prompts you with an intentional breath barrier before you enter an infinite scroll loop. Does not record keystrokes or passwords.</string>
+    <string name="accessibility_service_description">UNSCROLL uses Android Accessibility to identify selected interface view IDs for Instagram Reels and YouTube Shorts while those apps are active. Detection runs on this device. UNSCROLL does not read screen text, messages, accessibility descriptions, keystrokes, or passwords, and does not send accessibility data to a server. TikTok detection is not currently supported.</string>
 </resources>
