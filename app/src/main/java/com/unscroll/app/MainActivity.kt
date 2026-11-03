@@ -381,7 +381,7 @@ fun UnscrollAppRoot(
                             colors = ButtonDefaults.buttonColors(containerColor = SoftGreenPrimary)
                         ) {
                             Text(
-                                text = "Put Down Phone (+1 Thwarted)",
+                                text = "I’ll take a break",
                                 color = DarkBackground,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp
@@ -397,7 +397,7 @@ fun UnscrollAppRoot(
                                 .height(44.dp)
                         ) {
                             Text(
-                                text = "Continue for 60s Mindfully",
+                                text = "Continue anyway",
                                 color = TextMuted,
                                 fontSize = 12.sp
                             )
