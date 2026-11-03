@@ -18,6 +18,7 @@ import java.util.Calendar
 /**
  * Repository responsible for querying real on-device screen time metrics via Android UsageStatsManager.
  * Zero fabricated or hardcoded statistics. If permission is not granted, displays clear empty state.
+ * Interception counts are stored separately for each local calendar day.
  */
 class StatsRepository(private val context: Context) {
 
@@ -26,12 +27,22 @@ class StatsRepository(private val context: Context) {
         Context.MODE_PRIVATE
     )
 
-    private val _interceptionCounter = MutableStateFlow(prefs.getInt(KEY_REAL_INTERCEPTIONS, 0))
+    private var activeInterceptionKey = interceptionKeyForToday()
+    private val _interceptionCounter = MutableStateFlow(prefs.getInt(activeInterceptionKey, 0))
     val interceptionCounter: StateFlow<Int> = _interceptionCounter.asStateFlow()
 
+    private fun refreshInterceptionCounterForToday() {
+        val todayKey = interceptionKeyForToday()
+        if (todayKey != activeInterceptionKey) {
+            activeInterceptionKey = todayKey
+            _interceptionCounter.value = prefs.getInt(todayKey, 0)
+        }
+    }
+
     fun recordInterception() {
+        refreshInterceptionCounterForToday()
         val next = _interceptionCounter.value + 1
-        prefs.edit().putInt(KEY_REAL_INTERCEPTIONS, next).apply()
+        prefs.edit().putInt(activeInterceptionKey, next).apply()
         _interceptionCounter.value = next
     }
 
@@ -62,6 +73,7 @@ class StatsRepository(private val context: Context) {
      * Never returns fake or fabricated numbers.
      */
     fun getDailyOverview(): ScreenTimeOverview {
+        refreshInterceptionCounterForToday()
         val hasPermission = hasUsageStatsPermission()
 
         if (!hasPermission) {
@@ -69,7 +81,7 @@ class StatsRepository(private val context: Context) {
             return ScreenTimeOverview(
                 totalScreenTimeMinutes = 0,
                 totalInterceptions = _interceptionCounter.value,
-                totalTimeSavedMinutes = (_interceptionCounter.value * 6),
+                totalTimeSavedMinutes = 0,
                 hasUsageData = false,
                 isRealUsageStatsAvailable = false,
                 dataNotice = "Permission required: Grant Android Usage Access in System Settings to view screen time."
@@ -80,7 +92,7 @@ class StatsRepository(private val context: Context) {
             ?: return ScreenTimeOverview(
                 totalScreenTimeMinutes = 0,
                 totalInterceptions = _interceptionCounter.value,
-                totalTimeSavedMinutes = (_interceptionCounter.value * 6),
+                totalTimeSavedMinutes = 0,
                 hasUsageData = false,
                 isRealUsageStatsAvailable = false,
                 dataNotice = "UsageStatsManager service unavailable on this device."
@@ -105,7 +117,7 @@ class StatsRepository(private val context: Context) {
             return ScreenTimeOverview(
                 totalScreenTimeMinutes = 0,
                 totalInterceptions = _interceptionCounter.value,
-                totalTimeSavedMinutes = (_interceptionCounter.value * 6),
+                totalTimeSavedMinutes = 0,
                 hasUsageData = true,
                 isRealUsageStatsAvailable = true,
                 dataNotice = "No social media usage detected yet today."
@@ -123,12 +135,10 @@ class StatsRepository(private val context: Context) {
             }
         }
 
-        val totalSaved = (_interceptionCounter.value * 6)
-
         return ScreenTimeOverview(
             totalScreenTimeMinutes = totalTargetMinutes,
             totalInterceptions = _interceptionCounter.value,
-            totalTimeSavedMinutes = totalSaved,
+            totalTimeSavedMinutes = 0,
             hasUsageData = true,
             isRealUsageStatsAvailable = true,
             dataNotice = "Live data synced from Android UsageStatsManager."
@@ -140,6 +150,7 @@ class StatsRepository(private val context: Context) {
      * Returns empty list if permission is missing, or actual queried usage.
      */
     fun getAppBreakdown(): List<DailyAppUsage> {
+        refreshInterceptionCounterForToday()
         val hasPermission = hasUsageStatsPermission()
         if (!hasPermission) {
             return emptyList()
@@ -182,7 +193,14 @@ class StatsRepository(private val context: Context) {
         )
     }
 
-    companion object {
-        private const val KEY_REAL_INTERCEPTIONS = "key_real_interceptions"
+    private fun interceptionKeyForToday(): String {
+        val today = Calendar.getInstance()
+        val dateKey = String.format(
+            java.util.Locale.US,
+            "%04d-%03d",
+            today.get(Calendar.YEAR),
+            today.get(Calendar.DAY_OF_YEAR)
+        )
+        return "key_real_interceptions_$dateKey"
     }
 }

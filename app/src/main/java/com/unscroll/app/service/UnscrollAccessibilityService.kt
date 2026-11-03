@@ -13,13 +13,14 @@ import com.unscroll.app.data.repository.SettingsRepository
 import com.unscroll.app.data.repository.StatsRepository
 
 /**
- * Native Android Accessibility Service that non-invasively detects algorithmic short-form
- * video containers (Reels, Shorts, TikTok) in real time.
+ * Native Android Accessibility Service that checks selected view IDs for Instagram Reels
+ * and YouTube Shorts. TikTok automatic detection is intentionally disabled until reliable
+ * feed-specific identifiers can be verified.
  *
  * PRIVACY NOTES:
  * - Feed detection is processed locally on the device.
  * - Recognized password and text-input nodes are skipped.
- * - The service checks selected view IDs and accessibility descriptions.
+ * - The service checks selected view IDs only.
  * - It may access parts of the active app's interface to identify feeds.
  */
 class UnscrollAccessibilityService : AccessibilityService() {
@@ -87,12 +88,9 @@ class UnscrollAccessibilityService : AccessibilityService() {
             }
 
             TargetApp.TIKTOK.packageName, "com.ss.android.ugc.trill" -> {
-                if (!settingsRepository.tiktokConfig.value.isProtectionEnabled) return
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) return
-
-                lastInterceptTime = currentTime
-                statsRepository.recordInterception()
-                triggerMindfulInterception("TikTok")
+                // TikTok feed-specific view identifiers have not been verified.
+                // Do not intercept the whole app: that would block chats, profiles and settings too.
+                return
             }
         }
     }

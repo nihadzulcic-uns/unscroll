@@ -3,7 +3,6 @@ package com.unscroll.app.ui.screens
 import android.content.Intent
 import android.provider.Settings
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,7 +26,6 @@ fun StatisticsScreen(
     uiState: UnscrollUiState,
     onRefreshStats: () -> Unit
 ) {
-    var selectedTimeframe by remember { mutableStateOf("Daily") }
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
@@ -109,43 +107,6 @@ fun StatisticsScreen(
         Spacer(modifier = Modifier.height(18.dp))
 
         if (uiState.overview.isRealUsageStatsAvailable) {
-            // Timeframe Segmented Control
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(CharcoalSurface, RoundedCornerShape(12.dp))
-                    .padding(3.dp),
-                horizontalArrangement = Arrangement.spacedBy(3.dp)
-            ) {
-                listOf("Daily", "Weekly").forEach { timeframe ->
-                    val isSelected = selectedTimeframe == timeframe
-                    Surface(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { selectedTimeframe = timeframe },
-                        shape = RoundedCornerShape(8.dp),
-                        color = if (isSelected) CharcoalSurfaceElevated else Color.Transparent,
-                        border = if (isSelected) androidx.compose.foundation.BorderStroke(1.dp, SoftGreenPrimary) else null
-                    ) {
-                        Box(
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = timeframe,
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (isSelected) SoftGreenPrimary else TextSecondary,
-                                    fontSize = 12.sp
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             // Real Metrics Card
             Surface(
                 modifier = Modifier.fillMaxWidth(),
@@ -296,7 +257,7 @@ fun StatisticsScreen(
                         style = MaterialTheme.typography.titleMedium.copy(color = TextPrimary, fontWeight = FontWeight.Bold)
                     )
                     Text(
-                        text = "UNSCROLL strictly does not show fabricated statistics. Once Usage Access is enabled, real daily and weekly application metrics will populate here automatically.",
+                        text = "UNSCROLL strictly does not show fabricated statistics. Once Usage Access is enabled, real daily application metrics will populate here automatically.",
                         style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary, fontSize = 12.sp),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
