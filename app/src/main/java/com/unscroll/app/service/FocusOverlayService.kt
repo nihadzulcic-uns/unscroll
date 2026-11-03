@@ -9,7 +9,6 @@ import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.util.Log
@@ -18,10 +17,11 @@ import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import com.unscroll.app.MainActivity
 import com.unscroll.app.UnscrollApplication
+import com.unscroll.app.data.repository.StatsRepository
 
 /**
- * Service that displays a full-screen or banner overlay with a calming breathing cycle
- * before the user is sucked into an algorithmic short-form scroll loop.
+ * Displays the mindful pause barrier after a supported feed identifier is detected.
+ * An interception is counted only after Android successfully adds the overlay window.
  */
 class FocusOverlayService : Service() {
 
@@ -34,12 +34,14 @@ class FocusOverlayService : Service() {
 
     private var windowManager: WindowManager? = null
     private var overlayView: View? = null
+    private lateinit var statsRepository: StatsRepository
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        statsRepository = StatsRepository(applicationContext)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -48,14 +50,12 @@ class FocusOverlayService : Service() {
             val appName = intent.getStringExtra(EXTRA_APP_NAME) ?: "Distracting App"
             val notification = buildForegroundNotification("Protecting your attention in $appName")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                // SPECIAL_USE is available from Android 14 (API 34).
                 startForeground(
                     NOTIFICATION_ID,
                     notification,
                     android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
                 )
             } else {
-                // Older Android versions must use the two-argument overload.
                 startForeground(NOTIFICATION_ID, notification)
             }
             showCalmOverlay(appName)
@@ -87,10 +87,9 @@ class FocusOverlayService : Service() {
             gravity = Gravity.CENTER
         }
 
-        // Programmatic fallback view creation if layout inflation is deferred
         val container = android.widget.LinearLayout(this).apply {
             orientation = android.widget.LinearLayout.VERTICAL
-            setBackgroundColor(0xF00B0F0E.toInt()) // Deep charcoal/black with opacity
+            setBackgroundColor(0xF00B0F0E.toInt())
             gravity = Gravity.CENTER
             setPadding(48, 48, 48, 48)
         }
@@ -98,7 +97,7 @@ class FocusOverlayService : Service() {
         val title = TextView(this).apply {
             text = "Pause. Breathe."
             textSize = 28f
-            setTextColor(0xFF34D399.toInt()) // Soft green accent
+            setTextColor(0xFF34D399.toInt())
             gravity = Gravity.CENTER
             setPadding(0, 0, 0, 24)
         }
@@ -142,6 +141,8 @@ class FocusOverlayService : Service() {
         overlayView = container
         try {
             windowManager?.addView(overlayView, params)
+            statsRepository.recordInterception()
+            Log.i("FocusOverlayService", "Mindful barrier displayed for: $appName")
         } catch (e: Exception) {
             Log.e("FocusOverlayService", "Unable to display the focus overlay", e)
             closeOverlayAndService()
