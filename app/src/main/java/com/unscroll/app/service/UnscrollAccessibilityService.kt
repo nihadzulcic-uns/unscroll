@@ -31,9 +31,8 @@ class UnscrollAccessibilityService : AccessibilityService() {
             private set
     }
 
-    private var lastInterceptTime = 0L
+    private var activeTargetPackage: String? = null
     private var isFeedCurrentlyIntercepted = false
-    private val DEBOUNCE_MILLIS = 4000L // Safety debounce for rapid UI transitions
     private lateinit var settingsRepository: SettingsRepository
     private lateinit var statsRepository: StatsRepository
 
@@ -46,6 +45,8 @@ class UnscrollAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         isServiceRunning = true
+        activeTargetPackage = null
+        isFeedCurrentlyIntercepted = false
         Log.i(TAG, "UNSCROLL Accessibility Service Connected")
     }
 
@@ -57,12 +58,12 @@ class UnscrollAccessibilityService : AccessibilityService() {
         ) return
 
         val packageName = event.packageName?.toString() ?: return
-        if (packageName != TargetApp.INSTAGRAM.packageName && packageName != TargetApp.YOUTUBE.packageName) {
+        if (packageName != activeTargetPackage) {
+            activeTargetPackage = packageName.takeIf {
+                it == TargetApp.INSTAGRAM.packageName || it == TargetApp.YOUTUBE.packageName
+            }
             isFeedCurrentlyIntercepted = false
         }
-        val currentTime = System.currentTimeMillis()
-
-        if (currentTime - lastInterceptTime < DEBOUNCE_MILLIS) return
 
         when (packageName) {
             TargetApp.INSTAGRAM.packageName -> {
@@ -78,7 +79,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
                 } ?: return
 
                 try {
-                    inspectInstagram(rootNode, currentTime)
+                    inspectInstagram(rootNode)
                 } finally {
                     rootNode.recycle()
                 }
@@ -96,7 +97,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
                 } ?: return
 
                 try {
-                    inspectYouTube(rootNode, currentTime)
+                    inspectYouTube(rootNode)
                 } finally {
                     rootNode.recycle()
                 }
@@ -110,14 +111,13 @@ class UnscrollAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun inspectInstagram(node: AccessibilityNodeInfo, time: Long) {
+    private fun inspectInstagram(node: AccessibilityNodeInfo) {
         val isReelsActive = searchNodesForKeywords(
             node,
             listOf("clips_viewer", "reel_viewer", "reels_tab", "reel_player")
         )
         if (isReelsActive && !isFeedCurrentlyIntercepted) {
             isFeedCurrentlyIntercepted = true
-            lastInterceptTime = time
             statsRepository.recordInterception()
             triggerMindfulInterception("Instagram Reels")
         } else if (!isReelsActive) {
@@ -125,14 +125,13 @@ class UnscrollAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun inspectYouTube(node: AccessibilityNodeInfo, time: Long) {
+    private fun inspectYouTube(node: AccessibilityNodeInfo) {
         val isShortsActive = searchNodesForKeywords(
             node,
             listOf("reel_player_page", "shorts_pivot", "shorts_container", "shorts_player")
         )
         if (isShortsActive && !isFeedCurrentlyIntercepted) {
             isFeedCurrentlyIntercepted = true
-            lastInterceptTime = time
             statsRepository.recordInterception()
             triggerMindfulInterception("YouTube Shorts")
         } else if (!isShortsActive) {
@@ -204,6 +203,8 @@ class UnscrollAccessibilityService : AccessibilityService() {
 
     override fun onUnbind(intent: Intent?): Boolean {
         isServiceRunning = false
+        activeTargetPackage = null
+        isFeedCurrentlyIntercepted = false
         Log.i(TAG, "UNSCROLL Accessibility Service Unbound")
         return super.onUnbind(intent)
     }
