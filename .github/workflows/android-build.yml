@@ -1,13 +1,16 @@
-name: Build Unscroll Release APK
+name: Build Unscroll Android Release
 
 on:
   push:
     branches: [ "main", "fix/**" ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
-    name: Build Signed Release APK
+    name: Build Signed APK and Play Store AAB
     runs-on: ubuntu-latest
 
     steps:
@@ -32,30 +35,37 @@ jobs:
           echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/signing/unscroll-release.jks"
           echo "KEYSTORE_FILE=$RUNNER_TEMP/signing/unscroll-release.jks" >> "$GITHUB_ENV"
 
-      - name: Verify Release Keystore Password
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-        run: |
-          keytool -list -keystore "$KEYSTORE_FILE" -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS"
-
-      - name: Build Signed Release APK
+      - name: Verify Release Keystore
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
           test -n "$KEYSTORE_PASSWORD"
           test -n "$KEY_ALIAS"
+          keytool -list -keystore "$KEYSTORE_FILE" -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS"
+
+      - name: Build Signed Release APK and Android App Bundle
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --stacktrace
+          ./gradlew assembleRelease bundleRelease --stacktrace
 
-      - name: Verify APK Generated
-        run: ls -lh app/build/outputs/apk/release/app-release.apk
+      - name: Verify Release Outputs
+        run: |
+          test -s app/build/outputs/apk/release/app-release.apk
+          test -s app/build/outputs/bundle/release/app-release.aab
+          ls -lh app/build/outputs/apk/release/app-release.apk
+          ls -lh app/build/outputs/bundle/release/app-release.aab
+          sha256sum app/build/outputs/apk/release/app-release.apk app/build/outputs/bundle/release/app-release.aab
 
-      - name: Upload Unscroll Release APK
+      - name: Upload Unscroll APK and Play Store AAB
         uses: actions/upload-artifact@v4
         with:
-          name: unscroll-release-apk
-          path: app/build/outputs/apk/release/app-release.apk
+          name: unscroll-android-release
+          path: |
+            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 14
