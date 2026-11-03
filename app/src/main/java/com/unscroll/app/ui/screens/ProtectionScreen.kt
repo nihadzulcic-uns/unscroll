@@ -89,41 +89,26 @@ fun ProtectionScreen(
         )
         Spacer(modifier = Modifier.height(6.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(CharcoalSurface, RoundedCornerShape(12.dp))
-                .padding(3.dp),
-            horizontalArrangement = Arrangement.spacedBy(3.dp)
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            color = CharcoalSurface,
+            border = androidx.compose.foundation.BorderStroke(1.dp, SoftGreenPrimary.copy(alpha = 0.55f))
         ) {
-            listOf(
-                ProtectionMode.AUTOMATIC to "Auto Sentry",
-                ProtectionMode.MANUAL to "Manual Limit",
-                ProtectionMode.STRICT to "Strict Shield"
-            ).forEach { (mode, label) ->
-                val isSelected = uiState.protectionMode == mode
-                Surface(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable(enabled = mode == ProtectionMode.AUTOMATIC) { onSetProtectionMode(mode) },
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (isSelected) CharcoalSurfaceElevated else Color.Transparent,
-                    border = if (isSelected) androidx.compose.foundation.BorderStroke(1.dp, SoftGreenPrimary) else null
-                ) {
-                    Box(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = label,
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                color = if (isSelected) SoftGreenPrimary else TextSecondary,
-                                fontSize = 11.sp
-                            )
-                        )
-                    }
-                }
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text(
+                    text = "AUTOMATIC DETECTION — EXPERIMENTAL",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        letterSpacing = 1.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = SoftGreenPrimary
+                    )
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Manual time limits and strict blocking are not implemented yet, so they are hidden rather than shown as working controls.",
+                    style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary, fontSize = 11.sp)
+                )
             }
         }
 
@@ -407,33 +392,18 @@ private fun AppProtectionSettingCard(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Text(
-                    text = "The options below are saved preferences only. Daily quota enforcement is not available yet.",
-                    style = MaterialTheme.typography.labelSmall.copy(color = AmberWarning, fontSize = 11.sp)
-                )
-
-                // Daily Limit preference (not currently enforced)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                Surface(
+                    color = AmberWarning.copy(alpha = 0.10f),
+                    shape = RoundedCornerShape(8.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, AmberWarning.copy(alpha = 0.35f)),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Daily Quota: ${config.dailyLimitMinutes} minutes",
-                        style = MaterialTheme.typography.bodyMedium.copy(color = TextPrimary, fontSize = 13.sp)
+                        text = "Daily time quota is not enforced in this prototype. The limit control will return only when it actually counts usage and locks access reliably.",
+                        modifier = Modifier.padding(10.dp),
+                        style = MaterialTheme.typography.labelSmall.copy(color = AmberWarning, fontSize = 11.sp)
                     )
                 }
-                Slider(
-                    value = config.dailyLimitMinutes.toFloat(),
-                    onValueChange = { onConfigChange(config.copy(dailyLimitMinutes = it.toInt())) },
-                    valueRange = 5f..90f,
-                    steps = 16,
-                    colors = SliderDefaults.colors(
-                        thumbColor = SoftGreenPrimary,
-                        activeTrackColor = SoftGreenPrimary,
-                        inactiveTrackColor = CharcoalSurfaceElevated
-                    )
-                )
             }
         }
     }
