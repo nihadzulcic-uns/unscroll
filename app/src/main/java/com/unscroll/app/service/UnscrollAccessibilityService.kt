@@ -169,7 +169,11 @@ class UnscrollAccessibilityService : AccessibilityService() {
             putExtra(FocusOverlayService.EXTRA_APP_NAME, appName)
         }
         try {
-            startService(intent)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            } else {
+                startService(intent)
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start overlay service", e)
         }
