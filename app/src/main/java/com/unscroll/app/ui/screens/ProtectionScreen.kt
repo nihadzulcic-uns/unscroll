@@ -224,7 +224,7 @@ fun ProtectionScreen(
 
     if (showAccessibilityDisclosure) {
         AlertDialog(
-            onDismissRequest = { showAccessibilityDisclosure = false },
+            onDismissRequest = { showAccessibilityDisclosure = false; hasAccessibilityConsent = consentPrefs.getBoolean("accessibility_disclosure_accepted", false) },
             title = { Text("How UNSCROLL uses Accessibility") },
             text = {
                 Column {
@@ -254,7 +254,7 @@ fun ProtectionScreen(
                 ) { Text("Continue") }
             },
             dismissButton = {
-                TextButton(onClick = { showAccessibilityDisclosure = false }) {
+                TextButton(onClick = { showAccessibilityDisclosure = false; hasAccessibilityConsent = consentPrefs.getBoolean("accessibility_disclosure_accepted", false) }) {
                     Text("Not now")
                 }
             }
