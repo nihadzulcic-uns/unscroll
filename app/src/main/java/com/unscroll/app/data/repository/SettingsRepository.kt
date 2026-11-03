@@ -147,10 +147,10 @@ class SettingsRepository(private val context: Context) {
     private fun isAccessibilityServiceEnabled(): Boolean {
         val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as? AccessibilityManager ?: return false
         val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
-        val expectedServiceName = "${context.packageName}/${UnscrollAccessibilityService::class.java.canonicalName}"
+        val expectedServiceName = UnscrollAccessibilityService::class.java.name
         return enabledServices.any {
             val component = it.resolveInfo?.serviceInfo
-            component != null && component.packageName == context.packageName
+            component != null && component.packageName == context.packageName && component.name == expectedServiceName
         }
     }
 
@@ -221,6 +221,21 @@ class SettingsRepository(private val context: Context) {
         _instagramConfig.value = _instagramConfig.value.copy(status = resolveStatus(_instagramConfig.value.isProtectionEnabled))
         _youtubeConfig.value = _youtubeConfig.value.copy(status = resolveStatus(_youtubeConfig.value.isProtectionEnabled))
         _tiktokConfig.value = _tiktokConfig.value.copy(status = resolveStatus(_tiktokConfig.value.isProtectionEnabled))
+    }
+
+    /**
+     * Reload persisted protection choices. The Accessibility service owns a separate
+     * repository instance from the Activity, so its StateFlows otherwise become stale.
+     */
+    fun refreshProtectionConfigs() {
+        _instagramConfig.value = createAppConfig(
+            TargetApp.INSTAGRAM, KEY_IG_ENABLED, KEY_IG_REELS_ONLY,
+            KEY_IG_LIMIT, KEY_IG_PAUSE, KEY_IG_EXPLORE
+        )
+        _youtubeConfig.value = createAppConfig(
+            TargetApp.YOUTUBE, KEY_YT_ENABLED, KEY_YT_SHORTS_ONLY,
+            KEY_YT_LIMIT, KEY_YT_PAUSE, null
+        )
     }
 
     companion object {
