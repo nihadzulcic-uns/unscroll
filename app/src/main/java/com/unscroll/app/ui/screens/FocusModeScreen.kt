@@ -60,7 +60,7 @@ fun FocusModeScreen(
                     )
                 )
                 Text(
-                    text = if (isSessionActive) "Session in progress" else "Carve out intentional deep work",
+                    text = if (isSessionActive) "Focus timer in progress" else "Set aside time for focused work",
                     style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                 )
             }
@@ -126,7 +126,7 @@ fun FocusModeScreen(
                         )
                     )
                     Text(
-                        text = if (uiState.focusSession.isPaused) "PAUSED" else "DEEP PRESENCE",
+                        text = if (uiState.focusSession.isPaused) "PAUSED" else "FOCUS TIMER",
                         style = MaterialTheme.typography.labelSmall.copy(
                             letterSpacing = 1.5.sp,
                             fontSize = 10.sp,
@@ -321,7 +321,7 @@ fun FocusModeScreen(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Whenever an impulse to scroll occurs, take 3 deep belly breaths. The urge to doomscroll typically dissolves within 90 seconds.",
+                    text = "When you feel the urge to scroll, pause and take three slow breaths. This timer supports your intention but does not restrict app use.",
                     style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary, fontSize = 11.sp)
                 )
             }
