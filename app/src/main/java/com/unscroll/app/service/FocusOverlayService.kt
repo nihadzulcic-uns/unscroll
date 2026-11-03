@@ -120,7 +120,7 @@ class FocusOverlayService : Service() {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 }
                 startActivity(homeIntent)
-                removeOverlay()
+                closeOverlayAndService()
             }
         }
 
@@ -129,7 +129,7 @@ class FocusOverlayService : Service() {
             setBackgroundColor(0x2034D399.toInt())
             setTextColor(0xFF94A3B8.toInt())
             setOnClickListener {
-                removeOverlay()
+                closeOverlayAndService()
             }
         }
 
@@ -144,6 +144,12 @@ class FocusOverlayService : Service() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun closeOverlayAndService() {
+        removeOverlay()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
     }
 
     private fun removeOverlay() {
