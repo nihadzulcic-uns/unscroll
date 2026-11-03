@@ -40,6 +40,20 @@ fun ProtectionScreen(
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val consentPrefs = remember {
+        context.getSharedPreferences("unscroll_privacy_consent", android.content.Context.MODE_PRIVATE)
+    }
+    var hasAccessibilityConsent by remember {
+        mutableStateOf(consentPrefs.getBoolean("accessibility_disclosure_accepted", false))
+    }
+    var showAccessibilityDisclosure by remember { mutableStateOf(false) }
+    val openAccessibilitySettings = {
+        if (hasAccessibilityConsent) {
+            context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        } else {
+            showAccessibilityDisclosure = true
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -143,9 +157,7 @@ fun ProtectionScreen(
             subtitle = "Instagram Reels detection (experimental)",
             config = uiState.instagramConfig,
             onConfigChange = onUpdateInstagram,
-            onOpenAccessibilitySettings = {
-                context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-            },
+            onOpenAccessibilitySettings = openAccessibilitySettings,
             onOpenOverlaySettings = {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     context.startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")))
@@ -161,9 +173,7 @@ fun ProtectionScreen(
             subtitle = "YouTube Shorts detection (experimental)",
             config = uiState.youtubeConfig,
             onConfigChange = onUpdateYouTube,
-            onOpenAccessibilitySettings = {
-                context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-            },
+            onOpenAccessibilitySettings = openAccessibilitySettings,
             onOpenOverlaySettings = {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     context.startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")))
@@ -210,6 +220,45 @@ fun ProtectionScreen(
                 }
             }
         }
+    }
+
+    if (showAccessibilityDisclosure) {
+        AlertDialog(
+            onDismissRequest = { showAccessibilityDisclosure = false },
+            title = { Text("How UNSCROLL uses Accessibility") },
+            text = {
+                Column {
+                    Text(
+                        "UNSCROLL uses Android Accessibility access only to identify selected interface view IDs for Instagram Reels and YouTube Shorts, so it can show a mindful pause overlay. Detection happens on this device. The service does not intentionally read screen text, messages, passwords, keystrokes, or accessibility descriptions, and it does not send accessibility data to an UNSCROLL server. Detection is experimental and may not work with every app version."
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = hasAccessibilityConsent,
+                            onCheckedChange = { hasAccessibilityConsent = it }
+                        )
+                        Text("I understand and agree to enable this feature.")
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = hasAccessibilityConsent,
+                    onClick = {
+                        consentPrefs.edit()
+                            .putBoolean("accessibility_disclosure_accepted", true)
+                            .apply()
+                        showAccessibilityDisclosure = false
+                        context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                    }
+                ) { Text("Continue") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAccessibilityDisclosure = false }) {
+                    Text("Not now")
+                }
+            }
+        )
     }
 }
 
