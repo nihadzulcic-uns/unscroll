@@ -289,7 +289,15 @@ fun UnscrollAppRoot(
                         uiState = uiState,
                         onStartFocus = { viewModel.startFocusSession(it) },
                         onPauseFocus = { viewModel.pauseFocusSession() },
-                        onCancelFocus = { viewModel.cancelFocusSession() }
+                        onCancelFocus = {
+                            viewModel.cancelFocusSession()
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Home.route) {
+                                    inclusive = false
+                                }
+                                launchSingleTop = true
+                            }
+                        }
                     )
                 }
                 composable(Screen.Sleep.route) {
