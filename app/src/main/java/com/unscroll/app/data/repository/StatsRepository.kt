@@ -26,12 +26,12 @@ class StatsRepository(private val context: Context) {
         Context.MODE_PRIVATE
     )
 
-    private val _interceptionCounter = MutableStateFlow(prefs.getInt(KEY_REAL_INTERCEPTIONS, 0))
+    private val _interceptionCounter = MutableStateFlow(prefs.getInt(interceptionKeyForToday(), 0))
     val interceptionCounter: StateFlow<Int> = _interceptionCounter.asStateFlow()
 
     fun recordInterception() {
         val next = _interceptionCounter.value + 1
-        prefs.edit().putInt(KEY_REAL_INTERCEPTIONS, next).apply()
+        prefs.edit().putInt(interceptionKeyForToday(), next).apply()
         _interceptionCounter.value = next
     }
 
@@ -180,7 +180,14 @@ class StatsRepository(private val context: Context) {
         )
     }
 
-    companion object {
-        private const val KEY_REAL_INTERCEPTIONS = "key_real_interceptions"
+    private fun interceptionKeyForToday(): String {
+        val today = Calendar.getInstance()
+        val dateKey = String.format(
+            java.util.Locale.US,
+            "%04d-%03d",
+            today.get(Calendar.YEAR),
+            today.get(Calendar.DAY_OF_YEAR)
+        )
+        return "key_real_interceptions_$dateKey"
     }
 }
