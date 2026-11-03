@@ -232,7 +232,7 @@ fun SleepModeScreen(
                             style = MaterialTheme.typography.bodyMedium.copy(color = TextPrimary, fontSize = 13.sp)
                         )
                         Text(
-                            text = "Hard barrier on Instagram, YouTube and TikTok during sleep hours.",
+                            text = "Schedule preference is saved, but automatic app blocking is not implemented yet.",
                             style = MaterialTheme.typography.labelSmall.copy(color = TextMuted, fontSize = 11.sp)
                         )
                     }
@@ -262,7 +262,7 @@ fun SleepModeScreen(
                             style = MaterialTheme.typography.bodyMedium.copy(color = TextPrimary, fontSize = 13.sp)
                         )
                         Text(
-                            text = "Removes hyper-stimulating phone colors to ease melatonin release.",
+                            text = "Grayscale is not applied automatically yet; this setting currently saves your preference.",
                             style = MaterialTheme.typography.labelSmall.copy(color = TextMuted, fontSize = 11.sp)
                         )
                     }
