@@ -75,11 +75,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
                     rootInActiveWindow
                 } catch (e: Exception) {
                     null
-                } ?: run {
-                    // Do not leave the feed latch stuck if Android temporarily exposes no root node.
-                    isFeedCurrentlyIntercepted = false
-                    return
-                }
+                } ?: return // A temporary missing window root is not proof that the user left Reels.
 
                 try {
                     inspectInstagram(rootNode)
@@ -100,11 +96,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
                     rootInActiveWindow
                 } catch (e: Exception) {
                     null
-                } ?: run {
-                    // Do not leave the feed latch stuck if Android temporarily exposes no root node.
-                    isFeedCurrentlyIntercepted = false
-                    return
-                }
+                } ?: return // A temporary missing window root is not proof that the user left Reels.
 
                 try {
                     inspectYouTube(rootNode)
