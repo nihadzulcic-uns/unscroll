@@ -44,12 +44,16 @@ jobs:
           test -n "$KEY_ALIAS"
           keytool -list -keystore "$KEYSTORE_FILE" -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS"
 
+      - name: Run Release Unit Tests
+        run: |
+          chmod +x gradlew
+          ./gradlew testReleaseUnitTest --stacktrace
+
       - name: Build Signed Release APK and Android App Bundle
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
-          chmod +x gradlew
           ./gradlew assembleRelease bundleRelease --stacktrace
 
       - name: Verify Release Outputs
