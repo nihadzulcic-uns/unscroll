@@ -114,11 +114,7 @@ fun ProtectionScreen(
 
         Spacer(modifier = Modifier.height(6.dp))
         Text(
-            text = when (uiState.protectionMode) {
-                ProtectionMode.AUTOMATIC -> "Auto: Experimental Reels and Shorts view-ID detection can show a mindful pause overlay."
-                ProtectionMode.MANUAL -> "Manual limits are planned and are not enforced in this version."
-                ProtectionMode.STRICT -> "Strict blocking is planned and is not enforced in this version."
-            },
+            text = "Current prototype: automatic, experimental Reels and Shorts view-ID detection with a dismissible mindful pause. It does not lock the app or enforce a daily quota.",
             style = MaterialTheme.typography.bodySmall.copy(color = TextMuted, fontSize = 11.sp)
         )
 
