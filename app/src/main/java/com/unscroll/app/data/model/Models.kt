@@ -5,18 +5,19 @@ package com.unscroll.app.data.model
  */
 enum class ProtectionMode {
     /**
-     * Automatically senses Reels, Shorts, and TikTok video elements in the UI tree
-     * using AccessibilityService and brings up an intentional pause barrier.
+     * Checks experimental Instagram Reels and YouTube Shorts view IDs locally
+     * using AccessibilityService and can show a dismissible mindful pause overlay.
+     * This mode does not enforce a hard block or daily usage quota.
      */
     AUTOMATIC,
 
     /**
-     * Applies manual time limits and schedules (e.g. max 15m/day) before blocking.
+     * Planned manual time limits and schedules; not implemented yet.
      */
     MANUAL,
 
     /**
-     * Complete block during active focus or sleep hours without bypass options.
+     * Planned strict blocking during active focus or sleep hours; not implemented yet.
      */
     STRICT
 }
