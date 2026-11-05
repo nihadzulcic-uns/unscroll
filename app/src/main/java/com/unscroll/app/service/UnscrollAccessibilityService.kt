@@ -119,7 +119,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
     private fun inspectInstagram(node: AccessibilityNodeInfo) {
         val isReelsActive = searchNodesForKeywords(
             node,
-            listOf("clips_viewer", "reel_viewer", "reels_tab", "reel_player")
+            listOf("clips_viewer", "reel_viewer", "reel_player")
         )
         if (isReelsActive && !isFeedCurrentlyIntercepted) {
             isFeedCurrentlyIntercepted = triggerMindfulInterception("Instagram Reels")
@@ -131,7 +131,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
     private fun inspectYouTube(node: AccessibilityNodeInfo) {
         val isShortsActive = searchNodesForKeywords(
             node,
-            listOf("reel_player_page", "shorts_pivot", "shorts_container", "shorts_player")
+            listOf("reel_player_page", "shorts_container", "shorts_player")
         )
         if (isShortsActive && !isFeedCurrentlyIntercepted) {
             isFeedCurrentlyIntercepted = triggerMindfulInterception("YouTube Shorts")
