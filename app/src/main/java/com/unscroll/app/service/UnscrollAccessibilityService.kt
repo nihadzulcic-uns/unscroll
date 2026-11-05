@@ -189,7 +189,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
                 startService(intent)
             }
             // Latch only after Android accepts the service start request.
-            true
+            return true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start overlay service; feed detection may retry", e)
             false
