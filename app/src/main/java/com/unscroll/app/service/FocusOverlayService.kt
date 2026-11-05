@@ -82,7 +82,10 @@ class FocusOverlayService : Service() {
     }
 
     private fun showCalmOverlay(appName: String) {
-        if (overlayView != null) return
+        if (overlayView != null) {
+            overlayState = OVERLAY_STATE_VISIBLE
+            return
+        }
 
         val layoutParamsType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -158,14 +161,17 @@ class FocusOverlayService : Service() {
 
         overlayView = container
         try {
-            windowManager?.addView(overlayView, params)
+            val manager = windowManager ?: throw IllegalStateException("WindowManager unavailable")
+            manager.addView(overlayView, params)
             overlayState = OVERLAY_STATE_VISIBLE
             statsRepository.recordInterception()
             Log.i("FocusOverlayService", "Mindful barrier displayed for: $appName")
         } catch (e: Exception) {
             overlayState = OVERLAY_STATE_FAILED
             Log.e("FocusOverlayService", "Unable to display the focus overlay", e)
-            closeOverlayAndService()
+            removeOverlay()
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            stopSelf()
         }
     }
 
@@ -204,7 +210,12 @@ class FocusOverlayService : Service() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        if (overlayState == OVERLAY_STATE_SHOWING) {
+            overlayState = OVERLAY_STATE_FAILED
+        } else if (overlayState == OVERLAY_STATE_VISIBLE) {
+            overlayState = OVERLAY_STATE_DISMISSED
+        }
         removeOverlay()
+        super.onDestroy()
     }
 }
