@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
@@ -34,6 +36,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
     private var activeTargetPackage: String? = null
     private var isFeedCurrentlyIntercepted = false
     private lateinit var settingsRepository: SettingsRepository
+    private val mainHandler = Handler(Looper.getMainLooper())
     private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate() {
@@ -191,7 +194,13 @@ class UnscrollAccessibilityService : AccessibilityService() {
             } else {
                 startService(intent)
             }
-            // Latch only after Android accepts the service start request.
+            // Android accepting the request does not guarantee that the overlay window was created.
+            mainHandler.postDelayed({
+                if (FocusOverlayService.overlayState == FocusOverlayService.OVERLAY_STATE_FAILED) {
+                    isFeedCurrentlyIntercepted = false
+                    Log.w(TAG, "Overlay creation failed; allowing a later accessibility event to retry")
+                }
+            }, 2_000L)
             return true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start overlay service; feed detection may retry", e)
