@@ -5,8 +5,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
@@ -36,7 +34,6 @@ class UnscrollAccessibilityService : AccessibilityService() {
     private var activeTargetPackage: String? = null
     private var isFeedCurrentlyIntercepted = false
     private lateinit var settingsRepository: SettingsRepository
-    private val mainHandler = Handler(Looper.getMainLooper())
     private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate() {
