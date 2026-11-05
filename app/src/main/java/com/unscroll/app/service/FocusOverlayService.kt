@@ -53,19 +53,27 @@ class FocusOverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent?.action
         if (action == ACTION_SHOW_INTERCEPT) {
+            overlayState = OVERLAY_STATE_SHOWING
             val appName = intent.getStringExtra(EXTRA_APP_NAME) ?: "Distracting App"
             val notification = buildForegroundNotification("Protecting your attention in $appName")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                startForeground(
-                    NOTIFICATION_ID,
-                    notification,
-                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-                )
-            } else {
-                startForeground(NOTIFICATION_ID, notification)
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    startForeground(
+                        NOTIFICATION_ID,
+                        notification,
+                        android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                    )
+                } else {
+                    startForeground(NOTIFICATION_ID, notification)
+                }
+                showCalmOverlay(appName)
+            } catch (e: Exception) {
+                overlayState = OVERLAY_STATE_FAILED
+                Log.e("FocusOverlayService", "Unable to start foreground overlay service", e)
+                stopSelf()
             }
-            showCalmOverlay(appName)
         } else if (action == ACTION_CLOSE_OVERLAY) {
+            overlayState = OVERLAY_STATE_DISMISSED
             removeOverlay()
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
@@ -151,15 +159,18 @@ class FocusOverlayService : Service() {
         overlayView = container
         try {
             windowManager?.addView(overlayView, params)
+            overlayState = OVERLAY_STATE_VISIBLE
             statsRepository.recordInterception()
             Log.i("FocusOverlayService", "Mindful barrier displayed for: $appName")
         } catch (e: Exception) {
+            overlayState = OVERLAY_STATE_FAILED
             Log.e("FocusOverlayService", "Unable to display the focus overlay", e)
             closeOverlayAndService()
         }
     }
 
     private fun closeOverlayAndService() {
+        overlayState = OVERLAY_STATE_DISMISSED
         removeOverlay()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
