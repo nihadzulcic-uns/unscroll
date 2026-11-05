@@ -119,8 +119,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
             listOf("clips_viewer", "reel_viewer", "reels_tab", "reel_player")
         )
         if (isReelsActive && !isFeedCurrentlyIntercepted) {
-            isFeedCurrentlyIntercepted = true
-            triggerMindfulInterception("Instagram Reels")
+            isFeedCurrentlyIntercepted = triggerMindfulInterception("Instagram Reels")
         } else if (!isReelsActive) {
             isFeedCurrentlyIntercepted = false
         }
@@ -132,8 +131,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
             listOf("reel_player_page", "shorts_pivot", "shorts_container", "shorts_player")
         )
         if (isShortsActive && !isFeedCurrentlyIntercepted) {
-            isFeedCurrentlyIntercepted = true
-            triggerMindfulInterception("YouTube Shorts")
+            isFeedCurrentlyIntercepted = triggerMindfulInterception("YouTube Shorts")
         } else if (!isShortsActive) {
             isFeedCurrentlyIntercepted = false
         }
@@ -178,7 +176,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
         return false
     }
 
-    private fun triggerMindfulInterception(appName: String) {
+    private fun triggerMindfulInterception(appName: String): Boolean {
         Log.i(TAG, "Feed identifier matched for: $appName")
         val intent = Intent(this, FocusOverlayService::class.java).apply {
             action = FocusOverlayService.ACTION_SHOW_INTERCEPT
@@ -190,8 +188,11 @@ class UnscrollAccessibilityService : AccessibilityService() {
             } else {
                 startService(intent)
             }
+            // Latch only after Android accepts the service start request.
+            true
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to start overlay service", e)
+            Log.e(TAG, "Failed to start overlay service; feed detection may retry", e)
+            false
         }
     }
 
