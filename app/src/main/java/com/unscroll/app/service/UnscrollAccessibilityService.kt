@@ -192,7 +192,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
             return true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start overlay service; feed detection may retry", e)
-            false
+            return false
         }
     }
 
