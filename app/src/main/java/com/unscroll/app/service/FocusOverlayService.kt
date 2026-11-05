@@ -30,6 +30,12 @@ class FocusOverlayService : Service() {
         const val ACTION_CLOSE_OVERLAY = "action_close_overlay"
         const val EXTRA_APP_NAME = "extra_app_name"
         private const val NOTIFICATION_ID = 1001
+        const val OVERLAY_STATE_IDLE = 0
+        const val OVERLAY_STATE_SHOWING = 1
+        const val OVERLAY_STATE_VISIBLE = 2
+        const val OVERLAY_STATE_DISMISSED = 3
+        const val OVERLAY_STATE_FAILED = 4
+        @Volatile var overlayState: Int = OVERLAY_STATE_IDLE
     }
 
     private var windowManager: WindowManager? = null
