@@ -59,10 +59,12 @@ class UnscrollAccessibilityService : AccessibilityService() {
         ) return
 
         val packageName = event.packageName?.toString() ?: return
-        // Package filtering means Android does not send launcher/other-app events here.
-        // A new target-app window is therefore the reliable boundary for a fresh check.
+        // The service is filtered to Instagram and YouTube only, so it cannot observe
+        // the launcher while the user changes settings. Refresh on each new app window
+        // (not every scroll/content event) to pick up settings changed outside the target app.
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             isFeedCurrentlyIntercepted = false
+            settingsRepository.refreshProtectionConfigs()
         }
         val targetPackageChanged = packageName != activeTargetPackage
         if (targetPackageChanged) {
@@ -74,7 +76,6 @@ class UnscrollAccessibilityService : AccessibilityService() {
 
         when (packageName) {
             TargetApp.INSTAGRAM.packageName -> {
-                if (targetPackageChanged) settingsRepository.refreshProtectionConfigs()
                 if (!settingsRepository.instagramConfig.value.isProtectionEnabled ||
                     (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this))) {
                     isFeedCurrentlyIntercepted = false
@@ -95,7 +96,6 @@ class UnscrollAccessibilityService : AccessibilityService() {
             }
 
             TargetApp.YOUTUBE.packageName -> {
-                if (targetPackageChanged) settingsRepository.refreshProtectionConfigs()
                 if (!settingsRepository.youtubeConfig.value.isProtectionEnabled ||
                     (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this))) {
                     isFeedCurrentlyIntercepted = false
