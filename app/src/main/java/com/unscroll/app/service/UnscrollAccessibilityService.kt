@@ -59,7 +59,8 @@ class UnscrollAccessibilityService : AccessibilityService() {
         ) return
 
         val packageName = event.packageName?.toString() ?: return
-        if (packageName != activeTargetPackage) {
+        val targetPackageChanged = packageName != activeTargetPackage
+        if (targetPackageChanged) {
             activeTargetPackage = packageName.takeIf {
                 it == TargetApp.INSTAGRAM.packageName || it == TargetApp.YOUTUBE.packageName
             }
@@ -68,7 +69,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
 
         when (packageName) {
             TargetApp.INSTAGRAM.packageName -> {
-                settingsRepository.refreshProtectionConfigs()
+                if (targetPackageChanged) settingsRepository.refreshProtectionConfigs()
                 if (!settingsRepository.instagramConfig.value.isProtectionEnabled ||
                     (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this))) {
                     isFeedCurrentlyIntercepted = false
@@ -89,7 +90,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
             }
 
             TargetApp.YOUTUBE.packageName -> {
-                settingsRepository.refreshProtectionConfigs()
+                if (targetPackageChanged) settingsRepository.refreshProtectionConfigs()
                 if (!settingsRepository.youtubeConfig.value.isProtectionEnabled ||
                     (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this))) {
                     isFeedCurrentlyIntercepted = false
