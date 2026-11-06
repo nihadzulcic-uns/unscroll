@@ -44,7 +44,7 @@ fun ProtectionScreen(
         context.getSharedPreferences("unscroll_privacy_consent", android.content.Context.MODE_PRIVATE)
     }
     var hasAccessibilityConsent by remember {
-        mutableStateOf(consentPrefs.getBoolean("accessibility_disclosure_accepted", false))
+        mutableStateOf(consentPrefs.getBoolean("accessibility_disclosure_v2_accepted", false))
     }
     var showAccessibilityDisclosure by remember { mutableStateOf(false) }
     val openAccessibilitySettings = {
@@ -195,7 +195,7 @@ fun ProtectionScreen(
                     )
                     Spacer(modifier = Modifier.height(3.dp))
                     Text(
-                        text = "Feed detection runs locally by checking selected view IDs in Instagram and YouTube. The service does not read screen text, messages, accessibility descriptions, keystrokes, or passwords. TikTok detection is currently unavailable.",
+                        text = "Feed detection runs locally by checking selected view IDs inside Instagram and YouTube. To detect when you leave either app, the service also receives window events from other apps but reads only their package identifier; it does not inspect their screens. It does not read screen text, messages, accessibility descriptions, keystrokes, or passwords. No accessibility data is sent to an UNSCROLL server. TikTok detection is currently unavailable.",
                         style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary, fontSize = 11.sp)
                     )
                 }
@@ -205,12 +205,12 @@ fun ProtectionScreen(
 
     if (showAccessibilityDisclosure) {
         AlertDialog(
-            onDismissRequest = { showAccessibilityDisclosure = false; hasAccessibilityConsent = consentPrefs.getBoolean("accessibility_disclosure_accepted", false) },
+            onDismissRequest = { showAccessibilityDisclosure = false; hasAccessibilityConsent = consentPrefs.getBoolean("accessibility_disclosure_v2_accepted", false) },
             title = { Text("How UNSCROLL uses Accessibility") },
             text = {
                 Column {
                     Text(
-                        "UNSCROLL uses Android Accessibility access only to identify selected interface view IDs for Instagram Reels and YouTube Shorts, so it can show a mindful pause overlay. Detection happens on this device. The service does not intentionally read screen text, messages, passwords, keystrokes, or accessibility descriptions, and it does not send accessibility data to an UNSCROLL server. Detection is experimental and may not work with every app version."
+                        "UNSCROLL uses Android Accessibility access to identify selected interface view IDs inside Instagram Reels and YouTube Shorts, so it can show a mindful pause overlay. It also receives window events from other apps to detect when you leave Instagram or YouTube; for those apps it reads only the package identifier and does not inspect their screens. Detection happens on this device. The service does not intentionally read screen text, messages, passwords, keystrokes, or accessibility descriptions, and it does not send accessibility data to an UNSCROLL server. Detection is experimental and may not work with every app version."
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -227,7 +227,7 @@ fun ProtectionScreen(
                     enabled = hasAccessibilityConsent,
                     onClick = {
                         consentPrefs.edit()
-                            .putBoolean("accessibility_disclosure_accepted", true)
+                            .putBoolean("accessibility_disclosure_v2_accepted", true)
                             .apply()
                         showAccessibilityDisclosure = false
                         context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -235,7 +235,7 @@ fun ProtectionScreen(
                 ) { Text("Continue") }
             },
             dismissButton = {
-                TextButton(onClick = { showAccessibilityDisclosure = false; hasAccessibilityConsent = consentPrefs.getBoolean("accessibility_disclosure_accepted", false) }) {
+                TextButton(onClick = { showAccessibilityDisclosure = false; hasAccessibilityConsent = consentPrefs.getBoolean("accessibility_disclosure_v2_accepted", false) }) {
                     Text("Not now")
                 }
             }
