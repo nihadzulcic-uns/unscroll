@@ -83,7 +83,6 @@ class UnscrollAccessibilityService : AccessibilityService() {
 
         // Reload saved settings on entry to a target app window, not on every scroll event.
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-            isFeedCurrentlyIntercepted = false
             settingsRepository.refreshProtectionConfigs()
         }
         val targetPackageChanged = packageName != activeTargetPackage
