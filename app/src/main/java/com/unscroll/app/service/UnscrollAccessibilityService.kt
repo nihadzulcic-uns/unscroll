@@ -90,8 +90,15 @@ class UnscrollAccessibilityService : AccessibilityService() {
 
                 try {
                     inspectInstagram(rootNode)
+                } catch (e: Exception) {
+                    isFeedCurrentlyIntercepted = false
+                    Log.e(TAG, "Instagram feed inspection failed safely", e)
                 } finally {
-                    rootNode.recycle()
+                    try {
+                        rootNode.recycle()
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Unable to recycle Instagram accessibility root", e)
+                    }
                 }
             }
 
@@ -110,8 +117,15 @@ class UnscrollAccessibilityService : AccessibilityService() {
 
                 try {
                     inspectYouTube(rootNode)
+                } catch (e: Exception) {
+                    isFeedCurrentlyIntercepted = false
+                    Log.e(TAG, "YouTube feed inspection failed safely", e)
                 } finally {
-                    rootNode.recycle()
+                    try {
+                        rootNode.recycle()
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Unable to recycle YouTube accessibility root", e)
+                    }
                 }
             }
 
