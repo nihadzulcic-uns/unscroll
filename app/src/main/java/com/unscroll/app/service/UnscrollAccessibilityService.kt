@@ -59,6 +59,11 @@ class UnscrollAccessibilityService : AccessibilityService() {
         ) return
 
         val packageName = event.packageName?.toString() ?: return
+        // Package filtering means Android does not send launcher/other-app events here.
+        // A new target-app window is therefore the reliable boundary for a fresh check.
+        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            isFeedCurrentlyIntercepted = false
+        }
         val targetPackageChanged = packageName != activeTargetPackage
         if (targetPackageChanged) {
             activeTargetPackage = packageName.takeIf {
