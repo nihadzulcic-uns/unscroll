@@ -29,8 +29,8 @@ enum class ProtectionMode {
 enum class ServiceStatus(val displayName: String) {
     NOT_CONFIGURED("Not configured"),
     PERMISSION_REQUIRED("Permission required"),
-    ACTIVE("Active"),
-    ERROR("Error")
+    ACTIVE("Service running"),
+    ERROR("Service unavailable")
 }
 
 /**
