@@ -69,7 +69,10 @@ class UnscrollAccessibilityService : AccessibilityService() {
         // Ignore our own overlay/activity window so showing the pause screen does not
         // look like the user has left the monitored app.
         if (!isTargetPackage) {
-            if (packageName != this.packageName &&
+            val isOurVisiblePauseOverlay = packageName == this.packageName &&
+                (FocusOverlayService.overlayState == FocusOverlayService.OVERLAY_STATE_SHOWING ||
+                    FocusOverlayService.overlayState == FocusOverlayService.OVERLAY_STATE_VISIBLE)
+            if (!isOurVisiblePauseOverlay &&
                 event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
             ) {
                 activeTargetPackage = null
