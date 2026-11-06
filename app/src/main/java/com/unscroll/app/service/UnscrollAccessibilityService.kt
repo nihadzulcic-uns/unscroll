@@ -20,8 +20,9 @@ import com.unscroll.app.data.repository.SettingsRepository
  * PRIVACY NOTES:
  * - Feed detection is processed locally on the device.
  * - Recognized password and text-input nodes are skipped.
- * - The service checks selected view IDs only.
- * - It may access parts of the active app's interface to identify feeds.
+ * - The service receives selected window events to detect when the user leaves a monitored app.
+ * - For non-target apps it reads only the event package name, then returns without inspecting the UI tree.
+ * - It inspects selected view IDs only inside Instagram and YouTube.
  */
 class UnscrollAccessibilityService : AccessibilityService() {
 
@@ -59,9 +60,25 @@ class UnscrollAccessibilityService : AccessibilityService() {
         ) return
 
         val packageName = event.packageName?.toString() ?: return
-        // The service is filtered to Instagram and YouTube only, so it cannot observe
-        // the launcher while the user changes settings. Refresh on each new app window
-        // (not every scroll/content event) to pick up settings changed outside the target app.
+        val isTargetPackage = packageName == TargetApp.INSTAGRAM.packageName ||
+            packageName == TargetApp.YOUTUBE.packageName
+
+        // We now receive window events across apps so a Reels/Shorts session can end
+        // when the user switches to another app. For every non-target app, inspect only
+        // the package name and never request or traverse its accessibility window tree.
+        // Ignore our own overlay/activity window so showing the pause screen does not
+        // look like the user has left the monitored app.
+        if (!isTargetPackage) {
+            if (packageName != this.packageName &&
+                event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+            ) {
+                activeTargetPackage = null
+                isFeedCurrentlyIntercepted = false
+            }
+            return
+        }
+
+        // Reload saved settings on entry to a target app window, not on every scroll event.
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             isFeedCurrentlyIntercepted = false
             settingsRepository.refreshProtectionConfigs()
