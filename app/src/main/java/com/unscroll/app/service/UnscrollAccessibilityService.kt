@@ -72,7 +72,12 @@ class UnscrollAccessibilityService : AccessibilityService() {
             val isOurVisiblePauseOverlay = packageName == this.packageName &&
                 (FocusOverlayService.overlayState == FocusOverlayService.OVERLAY_STATE_SHOWING ||
                     FocusOverlayService.overlayState == FocusOverlayService.OVERLAY_STATE_VISIBLE)
-            if (!isOurVisiblePauseOverlay &&
+            val inputMethodPackage = Settings.Secure.getString(
+                contentResolver,
+                Settings.Secure.DEFAULT_INPUT_METHOD
+            )?.substringBefore('/')
+            val isInputMethodWindow = packageName == inputMethodPackage
+            if (!isOurVisiblePauseOverlay && !isInputMethodWindow &&
                 event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
             ) {
                 activeTargetPackage = null
