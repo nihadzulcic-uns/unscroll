@@ -27,6 +27,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
 
     companion object {
         private const val TAG = "UnscrollService"
+        @Volatile
         var isServiceRunning: Boolean = false
             private set
     }
@@ -144,8 +145,15 @@ class UnscrollAccessibilityService : AccessibilityService() {
      * Traverses UI nodes to identify supported feed containers.
      * Recognized password and text-input nodes are skipped.
      */
-    private fun searchNodesForKeywords(node: AccessibilityNodeInfo?, keywords: List<String>): Boolean {
-        if (node == null) return false
+    private fun searchNodesForKeywords(
+        node: AccessibilityNodeInfo?,
+        keywords: List<String>,
+        depth: Int = 0,
+        visitedNodes: IntArray = intArrayOf(0)
+    ): Boolean {
+        // Guard against unusually large or deeply nested accessibility trees.
+        if (node == null || depth > 40 || visitedNodes[0] >= 2_000) return false
+        visitedNodes[0]++
 
         if (node.isPassword) return false
         val className = node.className?.toString() ?: ""
@@ -168,7 +176,7 @@ class UnscrollAccessibilityService : AccessibilityService() {
             }
             if (child != null) {
                 val found = try {
-                    searchNodesForKeywords(child, keywords)
+                    searchNodesForKeywords(child, keywords, depth + 1, visitedNodes)
                 } finally {
                     child.recycle()
                 }
