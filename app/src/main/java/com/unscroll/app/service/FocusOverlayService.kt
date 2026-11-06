@@ -46,7 +46,7 @@ class FocusOverlayService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        windowManager = getSystemService(Context.WINDOW_SERVICE) as? WindowManager
         statsRepository = StatsRepository(applicationContext)
     }
 
@@ -55,8 +55,8 @@ class FocusOverlayService : Service() {
         if (action == ACTION_SHOW_INTERCEPT) {
             overlayState = OVERLAY_STATE_SHOWING
             val appName = intent.getStringExtra(EXTRA_APP_NAME) ?: "Distracting App"
-            val notification = buildForegroundNotification("Protecting your attention in $appName")
             try {
+                val notification = buildForegroundNotification("Protecting your attention in $appName")
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     startForeground(
                         NOTIFICATION_ID,
@@ -162,9 +162,8 @@ class FocusOverlayService : Service() {
         overlayView = container
         try {
             val manager = windowManager ?: throw IllegalStateException("WindowManager unavailable")
-            manager.addView(overlayView, params)
+            manager.addView(container, params)
             overlayState = OVERLAY_STATE_VISIBLE
-            statsRepository.recordInterception()
             Log.i("FocusOverlayService", "Mindful barrier displayed for: $appName")
         } catch (e: Exception) {
             overlayState = OVERLAY_STATE_FAILED
@@ -172,6 +171,14 @@ class FocusOverlayService : Service() {
             removeOverlay()
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
+            return
+        }
+
+        // A statistics write must never remove a barrier that Android already displayed.
+        try {
+            statsRepository.recordInterception()
+        } catch (e: Exception) {
+            Log.w("FocusOverlayService", "Barrier shown, but interception statistics could not be saved", e)
         }
     }
 
