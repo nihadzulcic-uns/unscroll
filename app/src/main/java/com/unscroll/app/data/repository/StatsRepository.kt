@@ -124,16 +124,15 @@ class StatsRepository(private val context: Context) {
             )
         }
 
-        var totalTargetMinutes = 0
-        for (usage in stats) {
-            when (usage.packageName) {
-                TargetApp.INSTAGRAM.packageName,
-                TargetApp.YOUTUBE.packageName,
-                TargetApp.TIKTOK.packageName -> {
-                    totalTargetMinutes += (usage.totalTimeInForeground / 1000 / 60).toInt()
-                }
-            }
-        }
+        // Android may return more than one UsageStats row for the same package.
+        // Sum milliseconds first and convert to minutes once; truncating each row
+        // separately loses minutes and can make totals appear inconsistent.
+        val targetPackages = setOf(
+            TargetApp.INSTAGRAM.packageName,
+            TargetApp.YOUTUBE.packageName,
+            TargetApp.TIKTOK.packageName
+        )
+        val totalTargetMinutes = usageMinutesForPackages(stats, targetPackages)
 
         return ScreenTimeOverview(
             totalScreenTimeMinutes = totalTargetMinutes,
@@ -174,23 +173,29 @@ class StatsRepository(private val context: Context) {
             now
         ) ?: emptyList()
 
-        var igMinutes = 0
-        var ytMinutes = 0
-        var ttMinutes = 0
-
-        for (usage in stats) {
-            when (usage.packageName) {
-                TargetApp.INSTAGRAM.packageName -> igMinutes += (usage.totalTimeInForeground / 1000 / 60).toInt()
-                TargetApp.YOUTUBE.packageName -> ytMinutes += (usage.totalTimeInForeground / 1000 / 60).toInt()
-                TargetApp.TIKTOK.packageName -> ttMinutes += (usage.totalTimeInForeground / 1000 / 60).toInt()
-            }
-        }
+        val igMinutes = usageMinutesForPackages(stats, setOf(TargetApp.INSTAGRAM.packageName))
+        val ytMinutes = usageMinutesForPackages(stats, setOf(TargetApp.YOUTUBE.packageName))
+        val ttMinutes = usageMinutesForPackages(stats, setOf(TargetApp.TIKTOK.packageName))
 
         return listOf(
             DailyAppUsage(TargetApp.INSTAGRAM, igMinutes, 0, 0),
             DailyAppUsage(TargetApp.YOUTUBE, ytMinutes, 0, 0),
             DailyAppUsage(TargetApp.TIKTOK, ttMinutes, 0, 0)
         )
+    }
+
+    /**
+     * Sums all matching UsageStats rows before converting to whole minutes.
+     * Keeping the calculation in milliseconds avoids per-row truncation.
+     */
+    private fun usageMinutesForPackages(
+        stats: List<UsageStats>,
+        packageNames: Set<String>
+    ): Int {
+        val totalForegroundMillis = stats.asSequence()
+            .filter { it.packageName in packageNames }
+            .sumOf { it.totalTimeInForeground.coerceAtLeast(0L) }
+        return (totalForegroundMillis / 60_000L).toInt()
     }
 
     private fun interceptionKeyForToday(): String {
