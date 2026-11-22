@@ -71,7 +71,7 @@ fun ProtectionScreen(
             )
         )
         Text(
-            text = "Real-time algorithmic short-form video containment",
+            text = "Experimental on-device Reels and Shorts detection",
             style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
         )
 
