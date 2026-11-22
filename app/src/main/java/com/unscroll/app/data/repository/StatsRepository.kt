@@ -140,7 +140,7 @@ class StatsRepository(private val context: Context) {
             totalTimeSavedMinutes = 0,
             hasUsageData = true,
             isRealUsageStatsAvailable = true,
-            dataNotice = "Live data synced from Android UsageStatsManager."
+            dataNotice = "Usage data returned by Android UsageStatsManager. Refresh after using an app; update timing and accuracy can vary by device."
         )
     }
 
