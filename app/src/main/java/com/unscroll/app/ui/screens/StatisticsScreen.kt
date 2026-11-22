@@ -90,7 +90,7 @@ fun StatisticsScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Text(
-                        text = if (uiState.overview.isRealUsageStatsAvailable) "Live Android UsageStats Active" else "Permission Required for Live Telemetry",
+                        text = if (uiState.overview.isRealUsageStatsAvailable) "Android Usage Access Available" else "Permission Required for Live Telemetry",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 14.sp,
@@ -133,7 +133,7 @@ fun StatisticsScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "VERIFIED TODAY",
+                        text = "ANDROID USAGE DATA",
                         style = MaterialTheme.typography.labelSmall.copy(
                             letterSpacing = 1.5.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -150,7 +150,7 @@ fun StatisticsScreen(
                     ) {
                         Column {
                             Text(
-                                text = "Total Screen Time",
+                                text = "Target Apps Today",
                                 style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary)
                             )
                             Text(
