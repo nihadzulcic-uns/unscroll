@@ -127,12 +127,12 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Social Screen Time",
+                        text = "Target App Usage",
                         style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary)
                     )
                     if (uiState.overview.isRealUsageStatsAvailable) {
                         Text(
-                            text = "Verified Telemetry",
+                            text = "Usage Access Available",
                             style = MaterialTheme.typography.labelSmall.copy(color = SoftGreenPrimary)
                         )
                     } else {
@@ -197,7 +197,7 @@ fun HomeScreen(
                             )
                         )
                         Text(
-                            text = "Screen time measurement requires Android Usage Access permission. No fabricated statistics are shown.",
+                            text = "Usage measurement requires Android Usage Access. No fabricated statistics are shown.",
                             style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                         )
                         Button(
