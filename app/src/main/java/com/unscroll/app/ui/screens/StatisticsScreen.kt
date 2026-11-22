@@ -45,9 +45,26 @@ fun StatisticsScreen(
             )
         )
         Text(
-            text = "Measured screen time and detected short-form feed entries",
+            text = "Measured social-app usage and detected short-form feed entries",
             style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        OutlinedButton(
+            onClick = onRefreshStats,
+            shape = RoundedCornerShape(10.dp),
+            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, CharcoalSurfaceBorder)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text("Refresh measurements", fontSize = 12.sp)
+        }
 
         Spacer(modifier = Modifier.height(18.dp))
 
