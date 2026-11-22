@@ -24,12 +24,12 @@ enum class ProtectionMode {
 
 /**
  * Protection Service verification status.
- * Never labeled as ACTIVE unless verified running on the device.
+ * ACTIVE confirms only that the Accessibility service process is running; it does not prove feed detection or blocking works.
  */
 enum class ServiceStatus(val displayName: String) {
     NOT_CONFIGURED("Not configured"),
     PERMISSION_REQUIRED("Permission required"),
-    ACTIVE("Service running"),
+    ACTIVE("Accessibility running"),
     ERROR("Service unavailable")
 }
 
