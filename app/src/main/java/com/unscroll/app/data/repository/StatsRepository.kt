@@ -177,11 +177,16 @@ class StatsRepository(private val context: Context) {
         val ytMinutes = usageMinutesForPackages(stats, setOf(TargetApp.YOUTUBE.packageName))
         val ttMinutes = usageMinutesForPackages(stats, setOf(TargetApp.TIKTOK.packageName))
 
+        // Do not display apps with zero measured usage. This prevents the
+        // breakdown from looking like it is randomly selecting apps when Android
+        // has no foreground time recorded for them today.
         return listOf(
             DailyAppUsage(TargetApp.INSTAGRAM, igMinutes, 0, 0),
             DailyAppUsage(TargetApp.YOUTUBE, ytMinutes, 0, 0),
             DailyAppUsage(TargetApp.TIKTOK, ttMinutes, 0, 0)
         )
+            .filter { it.usageMinutes > 0 }
+            .sortedByDescending { it.usageMinutes }
     }
 
     /**
